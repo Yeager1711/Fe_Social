@@ -1,0 +1,29 @@
+.LikeShareCounts {
+    h2 {
+        font-size: 2rem;
+    }
+
+    .LikeShareCounts-container {
+        margin-top: 2rem;
+
+        .title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 2rem 0;
+
+            span {
+                font-size: 1.6rem;
+            }
+        }
+
+        .content {
+            p {
+                padding-top: 1rem;
+                font-size: 1.2rem;
+                line-height: 1.5;
+                color: #777;
+            }
+        }
+    }
+}

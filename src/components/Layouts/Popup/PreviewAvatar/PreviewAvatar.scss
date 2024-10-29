@@ -1,0 +1,24 @@
+.modal {
+    display: flex;
+    // background: var(--background) !important;
+
+    .modal-previewContainer {
+       width: 50rem;
+
+        .avatarPreview {
+            max-width: 30rem;
+            height: 30rem;
+            overflow: hidden;
+            border-radius: 50%;
+            margin: auto;
+
+            img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                overflow: hidden;
+                border-radius: 5rem;
+            }
+        }
+    }
+}

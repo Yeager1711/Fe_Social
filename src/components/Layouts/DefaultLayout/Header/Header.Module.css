@@ -1,0 +1,92 @@
+.wrapper {
+  padding: 1rem 6%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 99;
+  max-width: 100%;
+  background: #222;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
+}
+.wrapper .logo {
+  font-size: 2.7rem;
+  font-weight: 400;
+  color: #fff;
+  text-transform: capitalize;
+  font-family: "Poetsen One", sans-serif;
+}
+.wrapper .logo span {
+  text-transform: capitalize;
+  color: #0bb88a;
+  font-family: "Poetsen One", sans-serif;
+}
+.wrapper .navbar {
+  display: flex;
+  align-items: center;
+}
+.wrapper .navbar .nav-link {
+  font-size: 1.5rem;
+  padding: 0.4rem 1.7rem;
+  margin-left: 2rem;
+  text-transform: none;
+  background: none;
+  color: #fff;
+}
+.wrapper .navbar .nav-link.active {
+  border-radius: 0.5rem;
+  background: #17c29a;
+}
+.wrapper .navbar .nav-link:hover {
+  background: #17c29a;
+  color: #fff;
+  border-radius: 1rem;
+  cursor: pointer;
+}
+.wrapper .navbar .nav-link i {
+  font-size: 2rem;
+}
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+.wrapper .navbar .button-control .btn-HireMe {
+  padding: 0.5rem 2.6rem;
+  border-radius: 5rem;
+  border: 0.15rem dashed transparent;
+  background: #222;
+  color: #fff;
+  font-size: 1.4rem;
+  position: relative;
+  border-image-slice: 1;
+}
+.wrapper .navbar .button-control .btn-HireMe:hover {
+  animation: rotateBorder 3s linear infinite;
+}
+.wrapper .navbar .button-control .btn-HireMe::after {
+  content: "";
+  width: 4rem;
+  height: 4rem;
+  border: 0.5rem dashed #0bb88a;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-left: 1rem;
+}
+@keyframes modelFadeIn {
+  from {
+    transform: translateY(2rem);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}/*# sourceMappingURL=Header.Module.css.map */

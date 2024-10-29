@@ -1,0 +1,31 @@
+.CloseFriend {
+    h2 {
+        font-size: 2rem;
+    }
+
+    .CloseFriend-container {
+        .title {
+            margin: 2rem 0;
+            font-size: 1.3rem;
+            color: #888;
+        }
+
+        .box-search {
+            input {
+                padding: 1rem 1.5rem;
+                border-radius: .3rem;
+                border: .1rem solid var(--border);
+                width: 100%;
+                background: var(--bgSearch);
+            }
+        }
+
+        .wrapper-friends {
+            margin-top: 2rem;
+
+            .friend-item {
+                padding: 1.5rem 0;
+            }
+        }
+    }
+}

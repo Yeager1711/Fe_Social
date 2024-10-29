@@ -1,0 +1,159 @@
+.modal {
+
+
+    .modal-contentEditProfile {
+        background-color: var(--background);
+        padding: 2rem;
+        max-width: 55rem;
+        width: 95%;
+        border-radius: 2rem;
+        box-shadow: 0 .2rem 1rem rgba(0, 0, 0, 0.1);
+
+        h3 {
+            margin-bottom: 1rem;
+            font-size: 2rem;
+        }
+
+        .image-action {
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 1rem 0 2rem 0;
+            background: #efefef;
+            border-radius: 1rem;
+
+            .user-edit {
+                display: flex;
+                gap: 1rem;
+                align-items: center;
+
+                .image-user {
+                    width: 5rem;
+                    height: 5rem;
+                    object-fit: cover;
+                    border-radius: 5rem;
+                    overflow: hidden;
+
+                    img {
+                        width: 100%;
+                        height: 100%;
+                        object-fit: cover;
+                    }
+                }
+
+                .content-user {
+                    span {
+                        font-weight: 550;
+                        font-size: 1.5rem;
+                    }
+
+                    p {
+                        font-size: 1.2rem;
+                        margin-top: .3rem;
+                        color: #666;
+                    }
+                }
+            }
+
+            .button-action {
+                input {
+                    display: none;
+                }
+
+                label {
+                    padding: .6rem 1.5rem;
+                    background: #0095f6;
+                    border-radius: .5rem;
+                    color: var(--colorTextWhite);
+                    font-size: 1.25rem;
+                }
+            }
+        }
+
+        .form-group {
+            margin-bottom: 2.5rem;
+
+
+            label {
+                display: block;
+                margin-bottom: .5rem;
+                font-weight: bold;
+                font-size: 1.4rem;
+            }
+
+            input[type="text"] {
+                width: 100%;
+                padding: .8rem;
+                border-bottom: .1rem solid #ccc;
+            }
+
+            input[type="checkbox"] {
+                margin-right: 1rem;
+            }
+
+            span {
+                font-size: 1.5rem;
+                font-weight: 550;
+            }
+
+            p {
+                margin-top: .8rem;
+                width: 40rem;
+                color: #999;
+                font-size: 1.1rem;
+            }
+
+            .flex {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
+        }
+
+        .wrapper-details-Infomation {
+            height: 25rem;
+            padding: 0 1rem 0 0;
+            margin-bottom:2rem;
+            overflow-y: auto;
+
+            &::-webkit-scrollbar {
+                background: #dbdbdb;
+                height: .1rem;
+                width: 1rem;
+                border-radius: 1rem;
+              }
+          
+              &::-webkit-scrollbar-thumb {
+                height: .1rem;
+                width: .3rem;
+                background: #777;
+                border-radius: 5rem;
+                cursor: pointer;
+              }
+        }
+
+        .btn-done {
+            width: 100%;
+            padding: 1rem;
+            background: var( --bg_black); 
+            color: var(--colorTextWhite);
+            border: none;
+            border-radius: .4rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        
+            &:hover {
+                background-color: darken(#333, 10%);
+            }
+        
+            &:disabled {
+                background-color: var(--btn-disable);
+                color: var(--colorTextWhite);
+                cursor: not-allowed;
+                pointer-events: none;
+            }
+        }
+        
+    }
+}

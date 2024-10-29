@@ -1,0 +1,100 @@
+.wrapper-header {
+  padding: 2rem 2%;
+  min-height: 85vh;
+  width: calc(100% - 83%);
+  border-right: .1rem solid var(--border);
+
+  .logo {
+    display: grid;
+    height: calc(100vh - 90vh);
+    font-size: 2.7rem;
+    font-weight: 400;
+    color: var(--colorText);
+    text-transform: capitalize;
+    font-family: "Poetsen One", sans-serif;
+    text-align: center;
+    align-items: center;
+  }
+
+  .navbar {
+    height: calc(100vh - 26vh);
+
+    .nav-link {
+      font-size: 1.5rem;
+      padding: 2rem;
+      margin-left: 2rem;
+      text-transform: capitalize;
+      background: none;
+      color: var(--colorWhite);
+      position: relative;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      display: block;
+      display: flex;
+      align-items: center;
+      margin-bottom: 1rem;
+
+      &:hover {
+        background: var(--border);
+        border-radius: .5rem;
+        cursor: pointer;
+
+        svg {
+          transform: scale(1.1);
+          transition: .3s linear;
+        }
+      }
+
+      svg {
+        margin-right: 1rem;
+        font-size: 1.8rem;
+      }
+
+      img {
+        margin-right: 1rem;
+        width: 4rem;
+        height: 4rem;
+        border-radius: 5rem;
+        overflow: hidden;
+        object-fit: cover;
+      }
+
+      &.active {
+        color: var(--colorActive);
+        font-weight: bold;
+        border-bottom: 2px solid var(--colorActive);
+
+      }
+    }
+  }
+
+  .footer-header {
+    height: calc(100vh - 90vh);
+
+    .btn-moreOption {
+      font-size: 1.5rem;
+      padding: 2rem;
+      margin-left: 2rem;
+      text-transform: capitalize;
+      background: none;
+      color: var(--colorWhite);
+      position: relative;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+
+      svg {
+        margin-right: 1rem;
+        font-size: 2.2rem;
+      }
+
+      &.active {
+        color: var(--colorActive);
+        font-weight: bold;
+        border-bottom: 2px solid var(--colorActive);
+
+      }
+    }
+  }
+}
