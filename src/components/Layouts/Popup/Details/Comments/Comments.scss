@@ -53,7 +53,7 @@
 
     .product-post {
         position: relative;
-        width: 100rem;
+        width: 80rem;
         background: var(--bg_black);
         overflow: hidden;
         border-top-left-radius: 1rem;
@@ -87,7 +87,7 @@
     }
 
     .wrapper-infoComment {
-        width:70rem;
+        width: 70rem;
         height: 60rem;
         padding: 2rem;
         overflow: hidden;
@@ -108,6 +108,7 @@
             }
 
             .header-comment {
+
                 .user {
                     display: flex;
                     gap: 1rem;
@@ -126,12 +127,6 @@
                         font-size: 1.4rem;
                         font-weight: 550;
                     }
-
-                    .create_at {
-                        color: #999;
-                        font-size: 1.2rem;
-                        margin: .5rem 0 0 0;
-                    }
                 }
             }
 
@@ -142,7 +137,7 @@
                 .image-user {
                     width: 3.5rem;
                     height: 3.5rem;
-                   
+
 
                     img {
                         width: 100%;
@@ -155,14 +150,26 @@
                 .fullname-user {
                     font-size: 1.4rem;
                     font-weight: 550;
-                    width: 34rem;
-                    height: 10rem;
+                    width: 39rem;
                     overflow: hidden;
+
+                    span {
+                        display: flex;
+                        align-items: center;
+                        gap: .5rem;
+
+                        .create_at {
+                            color: #999;
+                            font-size: 1.2rem;
+                            font-weight: 400;
+                        }
+                    }
 
                     .description-post {
                         font-size: 1.3rem;
-                        font-weight: 400;
-                       
+                        font-weight: 400 !important;
+                        line-height: 1.4;
+
                     }
                 }
 
@@ -171,7 +178,18 @@
                 }
 
                 .comment {
-                    margin-bottom: 2rem;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 3rem;
+
+                    .comment-wrapper {
+                        gap: .5rem;
+
+                        .wrapper-user {
+
+                        }
+                    }
 
                     p {
                         display: flex;
@@ -183,14 +201,25 @@
                             width: 3rem;
                             height: 3rem;
                             border-radius: 5rem;
+                            object-fit: cover;
                         }
                     }
 
+                    .text-content {
+                        width: 29rem;
+                        margin-left: .5rem;
+                        font-weight: 400;
+                    }
+
                     .comment-meta {
+                        
                         font-size: 1.2rem;
                         color: gray;
-                        margin-left: 4rem;
-                        margin-top: -1rem;
+                        margin-top: .5rem;
+                    }
+
+                    svg {
+                        font-size: 1.4rem;
                     }
                 }
             }
@@ -216,7 +245,6 @@
             }
 
             .post-info-bottom {
-                // border-top: .1rem solid var(--border);
 
                 p {
                     font-size: 1.4rem;
@@ -234,16 +262,27 @@
             }
 
             .box-commentPost {
+                position: relative;
+                border: .1rem solid #dbdbdb;
+                border-radius: 5rem;
+                overflow: hidden;
 
                 input {
-                    width: 100%;
-                    border: .1rem solid #dbdbdb;
+                    width: 85%;
                     padding: .8rem 1.5rem;
-                    border-radius: 5rem;
 
                     &::placeholder {
                         text-transform: capitalize;
                     }
+                }
+
+                .btn-sendComment {
+                    position: absolute;
+                    top: 0;
+                    right: 0;
+                    padding: .8rem 1.5rem;
+                    background: none;
+                    color: var(--colorTextBlack);
                 }
             }
         }

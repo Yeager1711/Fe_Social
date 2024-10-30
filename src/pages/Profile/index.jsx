@@ -195,7 +195,9 @@ function Profile() {
                                         <PostActions />
 
                                     </div>
-                                    <div className="post-content">{article.postArticle.content}</div>
+                                    <div className="post-content"
+                                    dangerouslySetInnerHTML={{__html: article.postArticle.content}}
+                                    />
                                 </div>
                                 {/* Hiển thị hình ảnh bài viết */}
                                 <div className="post-image">
@@ -215,7 +217,7 @@ function Profile() {
                             </div>
                         ))
                     ) : (
-                        <p>No posts available.</p>
+                        <p style={{textAlign: 'center', fontSize: '1.4rem', marginTop: '1rem'}}>No posts available.</p>
                     )}
                 </div>
             </div>

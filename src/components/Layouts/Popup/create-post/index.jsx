@@ -86,10 +86,10 @@ const Modal = ({ isOpen, onClose, addNewPost  }) => {
 
         // trạng thái tải lên
         setIsUploading(true);
-
+        const formattedPostInfo  = postInfo.replace(/\n/g, '<br />');
         const formData = new FormData();
         formData.append("accountId", userData.accountId); // Include accountId
-        formData.append("postInfo", postInfo);
+        formData.append("postInfo", formattedPostInfo);
         if (selectedImage) formData.append('file', selectedImage);
         if (selectedVideo) formData.append('file', selectedVideo);
 
