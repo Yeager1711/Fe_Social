@@ -4,16 +4,32 @@ import styles from './createPost.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faLocationPin } from '@fortawesome/free-solid-svg-icons';
 
+
+import { Swiper, SwiperSlide } from 'swiper/react';
+import SwiperCore from 'swiper';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+import 'swiper/css/mousewheel';
+import 'swiper/css/keyboard';
+import 'swiper/css/autoplay';
+
+import { Pagination, Autoplay, Grid } from 'swiper/modules';
+
+
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import Swal from 'sweetalert2';
 
+//icon React
+import { LuFiles } from "react-icons/lu";
+import { CiCirclePlus } from "react-icons/ci";
+import { TiDelete } from "react-icons/ti";
 
 const cx = classNames.bind(styles);
 
 const apiUrl = process.env.REACT_APP_LOCAL_API_URL;
-const Modal = ({ isOpen, onClose, addNewPost  }) => {
-    const [selectedImage, setSelectedImage] = useState(null);
+const Modal = ({ isOpen, onClose, addNewPost }) => {
     const [expanded, setExpanded] = useState(false);
     const [selectedIcon, setSelectedIcon] = useState(null);
     const [showAllIcons, setShowAllIcons] = useState(false);
@@ -22,6 +38,10 @@ const Modal = ({ isOpen, onClose, addNewPost  }) => {
     const [error, setError] = useState(null);
     const [avatar, setAvatar] = useState({});
     const [fileObject, setFileObject] = useState(null);
+
+    const [selectedImage, setSelectedImage] = useState(null);
+    const [multipleFilesMode, setMultipleFilesMode] = useState(false);
+    const [selectedImages, setSelectedImages] = useState([]);
 
     // post article
     const [postInfo, setPostInfo] = useState('');
@@ -48,6 +68,10 @@ const Modal = ({ isOpen, onClose, addNewPost  }) => {
 
     if (!isOpen) return null;
 
+    const handleMultipleFilesClick = () => {
+        setMultipleFilesMode(!multipleFilesMode); // Chuyển đổi trạng thái
+    };
+
     const handleNext = () => {
         setExpanded(true);
     };
@@ -62,57 +86,90 @@ const Modal = ({ isOpen, onClose, addNewPost  }) => {
     };
 
     const handleFileChange = (event) => {
-        const file = event.target.files[0];
-        if (file) {
-            console.log('Tệp đã chọn:', file);
-
+        const files = Array.from(event.target.files);
+    
+        // Separate image and video files
+        const imageFiles = files.filter(file => file.type.startsWith('image/'));
+        const videoFiles = files.filter(file => file.type === 'video/mp4');
+    
+        // Single file selection logic
+        if (files.length === 1 && !multipleFilesMode) {
+            const file = files[0];
             setFileObject(file);
-            
+    
             if (file.type.startsWith('image/')) {
                 setSelectedImage(URL.createObjectURL(file));
-                setSelectedVideo(null); // Đặt lại video khi chọn hình ảnh
+                setSelectedVideo(null); // Clear video when an image is selected
+                setSelectedImages(prevImages => [
+                    ...prevImages.filter(image => image.url !== URL.createObjectURL(file)), // Remove duplicates
+                    { file: file, url: URL.createObjectURL(file) }
+                ]);
             } else if (file.type === 'video/mp4') {
                 setSelectedVideo(URL.createObjectURL(file));
-                setSelectedImage(null); // Đặt lại hình ảnh khi chọn video
+                setSelectedImage(null); // Clear image when a video is selected
             } else {
-                console.log('Vui lòng chọn đúng định dạng ảnh hoặc video !');
+                console.log('Please select an image or video in the correct format!');
                 setSelectedImage(null);
                 setSelectedVideo(null);
             }
         }
+        // Multiple file selection logic
+        else if (multipleFilesMode) {
+            const previewUrls = imageFiles.map(file => ({
+                file,
+                url: URL.createObjectURL(file),
+            }));
+    
+            // Add only unique images to selectedImages
+            setSelectedImages(prevImages => {
+                const existingUrls = new Set(prevImages.map(image => image.url));
+                const newImages = previewUrls.filter(preview => !existingUrls.has(preview.url));
+    
+                return [...prevImages, ...newImages]; // Combine existing images with new unique images
+            });
+        }
+    };
+    
+    const handleImageSelect = (image) => {
+        setSelectedImage(image.url);
+        setFileObject(image.file);
     };
 
+
+    const handleDeleteImage = (index) => {
+        setSelectedImages(prevImages => {
+            const updatedImages = prevImages.filter((_, i) => i !== index);
+            if (updatedImages.length === 0) {
+                setMultipleFilesMode(false);
+            }
+            return updatedImages;
+        });
+    };
+
+
     const handlePost = async () => {
-
-        // trạng thái tải lên
         setIsUploading(true);
-        const formattedPostInfo  = postInfo.replace(/\n/g, '<br />');
         const formData = new FormData();
-        formData.append("accountId", userData.accountId); // Include accountId
-        formData.append("postInfo", formattedPostInfo);
-        if (selectedImage) formData.append('file', selectedImage);
-        if (selectedVideo) formData.append('file', selectedVideo);
+        formData.append("accountId", userData.accountId);
+        formData.append("postInfo", postInfo);
 
-        if (fileObject) formData.append("media", fileObject); // Append the actual file
+        selectedImages.forEach(image => {
+            formData.append("media", image.file); // Append each selected image file
+        });
 
         try {
-            const responsePost = await axios.post(`${apiUrl}/post/post-article/create`, formData, {
-                headers: {
-                    Authorization: `Bearer ${Cookies.get('access_token')}`,
-                    'Content-Type': 'multipart/form-data'
-                }
+            await axios.post(`${apiUrl}/post/post-article/create`, formData, {
+                headers: { Authorization: `Bearer ${Cookies.get('access_token')}`, 'Content-Type': 'multipart/form-data' }
             });
-            Swal.fire({
-                icon: "success",
-            })
-            handleModalClose();
+            Swal.fire({ icon: "success" });
+            onClose(); // Close modal after successful upload
         } catch (error) {
-            console.error("Lỗi khi đăng bài:", error);
-            alert("Có lỗi xảy ra khi đăng bài, vui lòng thử lại!");
+            console.error("Error posting article:", error);
+            alert("An error occurred while posting, please try again!");
         } finally {
             setIsUploading(false);
         }
-    }
+    };
 
     const handleModalClose = () => {
         setSelectedImage(null);
@@ -121,7 +178,7 @@ const Modal = ({ isOpen, onClose, addNewPost  }) => {
     }
     return (
         <div className={cx('modal-overlay')} onClick={handleModalClose}>
-            <div className={cx('modal-content', { expanded })} onClick={(e) => e.stopPropagation()}>
+            <div className={cx('modal-content', { expanded: expanded, multipleFiles: multipleFilesMode })} onClick={(e) => e.stopPropagation()}>
                 <div className={cx('header-createPost')}>
 
                     {selectedImage && expanded && (
@@ -145,16 +202,43 @@ const Modal = ({ isOpen, onClose, addNewPost  }) => {
                 <div className={cx('modal-body', { expanded })}>
                     {expanded ? (
                         <>
-                            <div className={cx('image-preview')}>
-                                {selectedImage && !selectedVideo && (
-                                    <img src={selectedImage} alt="Selected" className={cx('preview-image')} />
-                                )}
-                                {selectedVideo && !selectedImage && (
-                                    <video controls className={cx('preview-video')}>
-                                        <source src={selectedVideo} type="video/mp4" />
-                                        Your browser does not support the video tag.
-                                    </video>
-                                )}
+                            <div className={cx('wapper-imagePreview-Multipless')}>
+                                <div>
+                                    {!multipleFilesMode && selectedImage && !selectedVideo && (
+                                        <div className={cx('image-preview-selected')}>
+                                            <img src={selectedImage} alt="Selected" className={cx('preview-image')} />
+                                        </div>
+                                    )}
+
+                                    {!multipleFilesMode && selectedVideo && !selectedImage && (
+                                        <div className={cx('image-preview-selected')}>
+                                            <video controls className={cx('preview-video')}>
+                                                <source src={selectedVideo} type="video/mp4" />
+                                                Your browser does not support the video tag.
+                                            </video>
+                                        </div>
+                                    )}
+
+                                    {multipleFilesMode && selectedImages.length > 0 && (
+                                        <div className={cx('multiple-imagess')}>
+                                            <div className={cx('images-selectedExpanded')}>
+                                                <Swiper pagination={true} modules={[Pagination]} className="mySwiper">
+                                                    {selectedImages.map((image, index) => (
+                                                        <div
+                                                            key={index} // Consider using a unique identifier if available
+                                                            className={cx('boxImage-multiplesPreview', { active: selectedImage === image.url })}
+                                                            onClick={() => handleImageSelect(image)}
+                                                        >
+                                                            <SwiperSlide>
+                                                                <img src={image.url} alt={`Selected ${index + 1}`} />
+                                                            </SwiperSlide>
+                                                        </div>
+                                                    ))}
+                                                </Swiper>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
 
                             <div className={cx('wrapper-contentPost')}>
@@ -215,27 +299,65 @@ const Modal = ({ isOpen, onClose, addNewPost  }) => {
                             </div>
                         </>
                     ) : (
-                        <div className={cx('select-folder')}>
-                            <div className={cx('box-selected')}>
-                                <div className='box'>
-                                    {/* svg */}
-                                    <span>Drag photos and videos here</span>
-                                    <div className='mr-top'>
+                        <div className={cx('wrapper-imageSelected-folder')}>
+                            <div className={cx('select-folder')}>
+                                <div className={cx('box-selected')}>
+                                    <div className='box'>
+                                        {/* svg */}
+                                        <span>Drag photos and videos here</span>
+                                        <div className='mr-top'>
+                                            <input
+                                                type="file"
+                                                accept="image/*,video/*"
+                                                className={cx('input-file')}
+                                                id="file-input"
+                                                onChange={handleFileChange}
+                                                style={{ display: 'none' }}
+                                            />
+                                            <label htmlFor="file-input" className={cx('btn-selectFolder')}>
+                                                Select from files
+                                            </label>
+                                        </div>
+                                        {selectedImage && (
+                                            <div className={cx('image-preview')}>
+                                                <img src={selectedImage} alt="Selected" className={cx('preview-image')} />
+                                                <div className={cx('select-multipleFiles')} onClick={handleMultipleFilesClick}>
+                                                    <LuFiles />
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className={cx("selected-Multiples")}>
+                                <div className={cx('selected-Multiples-container')}>
+                                    <div className={cx('box-chose')}>
                                         <input
                                             type="file"
-                                            accept="image/*,video/*"
-                                            className={cx('input-file')}
                                             id="file-input"
-                                            onChange={handleFileChange}
+                                            multiple // Thêm thuộc tính multiple
                                             style={{ display: 'none' }}
+                                            onChange={handleFileChange}
                                         />
-                                        <label htmlFor="file-input" className={cx('btn-selectFolder')}>
-                                            Select from files
+                                        <label htmlFor="file-input">
+                                            <CiCirclePlus />
                                         </label>
                                     </div>
-                                    {selectedImage && (
-                                        <div className={cx('image-preview')}>
-                                            <img src={selectedImage} alt="Selected" className={cx('preview-image')} />
+
+
+                                    {multipleFilesMode && (
+                                        <div className={cx('images-selectedMultiples')}>
+                                            {selectedImages.map((image, index) => (
+                                                <div
+                                                    key={index}
+                                                    className={cx('boxImage-multiplesPreview', { active: selectedImage === image.url })}
+                                                    onClick={() => handleImageSelect(image)}
+                                                >
+                                                    <TiDelete onClick={() => handleDeleteImage(index)} />
+                                                    <img src={image.url} alt={`Selected ${index + 1}`} />
+                                                </div>
+                                            ))}
                                         </div>
                                     )}
                                 </div>

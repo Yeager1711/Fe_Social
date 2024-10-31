@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styles from './Comments.scss';
 import classNames from 'classnames/bind';
 import { faX } from '@fortawesome/free-solid-svg-icons';
@@ -15,6 +16,8 @@ function DetailModalComments({ isOpen, onClose, postId }) {
     const [error, setError] = useState(null);
     const [comment, setComment] = useState("");
     const [commentsPost, setCommentsPost] = useState([]);
+
+    const navigate = useNavigate();
 
     const formatTimeAgo = (createAt) => {
         const createTime = new Date(createAt);
@@ -47,7 +50,11 @@ function DetailModalComments({ isOpen, onClose, postId }) {
                 const commentsResponse = await axios.get(`${apiUrl}/comments/get/getComments_PostID/${postId}`, {
                     headers: { Authorization: `Bearer ${Cookies.get('access_token')}` },
                 });
-                setCommentsPost(commentsResponse.data);
+
+                const sortedComments = commentsResponse.data.sort(
+                    (a, b) => new Date(b.created_at) - new Date(a.created_at)
+                )
+                setCommentsPost(sortedComments);
             }
         } catch (err) {
             setError(err.response ? err.response.data : "An error occurred");
@@ -87,6 +94,10 @@ function DetailModalComments({ isOpen, onClose, postId }) {
             console.error('Error submitting comment:', error);
         }
     };
+
+    // const handleProfileClick = () => {
+    //     navigate(`/SocializeIt/profile/@${username}`);
+    // };
 
     return (
         <div className={cx('modal-overlay')} onClick={onClose}>
@@ -143,9 +154,9 @@ function DetailModalComments({ isOpen, onClose, postId }) {
                                                             <img src={comment.account.avatar || "/images/avt_default.jpg"} alt="User Avatar" />
                                                         </div>
                                                         <div>
-                                                            <div style={{display: 'flex', fontWeight: 550}}>
-                                                                {comment.account.first_name} {comment.account.last_name}:
-                                                                <div className={cx('text-content')} >{comment.content}</div>
+                                                            <div style={{ display: 'flex', fontWeight: 550, cursor: 'pointer' }} >
+                                                                <p> {comment.account.first_name} {comment.account.last_name}:</p>
+                                                                <div className={cx('text-content')} style={{ cursor: 'copy' }}>{comment.content}</div>
                                                             </div>
                                                             <p className={cx('comment-meta')} >
                                                                 {formatTimeAgo(comment.created_at)} - {comment.likes_comment} likes

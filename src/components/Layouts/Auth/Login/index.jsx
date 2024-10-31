@@ -35,7 +35,7 @@ function Login() {
 
             if (response.data.success) {
                 // Lưu token vào cookies
-                Cookies.set('access_token', response.data.tokenAuth, { expires: 1 }); 
+                Cookies.set('access_token', response.data.tokenAuth, { expires: 1}); 
 
                 navigator('/');
             }

@@ -43,7 +43,7 @@ function Header() {
         .then((data) => {
           if (data && data.username) {
             setUsername(data.username);
-            setAvatar({avatar: data.avatar})
+            setAvatar({ avatar: data.avatar })
           }
         })
         .catch((error) => console.error('Error fetching user data:', error));
@@ -80,7 +80,7 @@ function Header() {
     if (token && username) {
       navigate(`/SocializeIt/profile/@${username}`);
     } else {
-      alert('Please log in to view your profile.');
+      navigate('/SocializeIt/auth/login');
     }
   };
 
