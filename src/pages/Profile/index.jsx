@@ -1,17 +1,31 @@
 import React, { useEffect, useState } from "react";
 import styles from './Profile.scss';
 import classNames from "classnames/bind";
+
+// swiper
+import { Swiper, SwiperSlide } from 'swiper/react';
+// Import Swiper styles
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+// import required modules
+import { Navigation, Pagination, Mousewheel, Keyboard } from 'swiper/modules';
+
+
+
 import axios from "axios";
 import { Navigate, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPencil, faUsers, faPenToSquare } from '@fortawesome/free-solid-svg-icons';
 import { faFacebook, faInstagram, } from '@fortawesome/free-brands-svg-icons';
-import { faHeart, faEllipsis, faComment, faShare, faBookmark, faThumbtack,faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faHeart, faEllipsis, faComment, faShare, faBookmark, faThumbtack, faTrash } from '@fortawesome/free-solid-svg-icons';
 
 import EditProfile from '~/components/Layouts/Popup/Edit/PopUP_Edit_Profile';
 import PreviewAvatar from '~/components/Layouts/Popup/PreviewAvatar';
 import DetailModalComments from '~/components/Layouts/Popup/Details/Comments';
 import PostActions from '~/components/Layouts/Popup/PostAction'
+
+
 
 import Cookies from "js-cookie";
 
@@ -27,8 +41,8 @@ function Profile() {
     const [error, setError] = useState(null);
     const [postArticle, setPostArticle] = useState([]);
     const [isModalOpen, setModalOpen] = useState(false);
-    const [selectedPostData, setSelectedPostData] = useState(null); 
-    const [commentsModalOpen, setCommentsModalOpen] = useState(false); 
+    const [selectedPostData, setSelectedPostData] = useState(null);
+    const [commentsModalOpen, setCommentsModalOpen] = useState(false);
     const [postData, setPostData] = useState(null);
 
 
@@ -36,7 +50,7 @@ function Profile() {
     const closeEditProfile = () => setEditOpen(false);
     const openPreviewAvatar = () => setPreviewAvatar(true);
     const closePreviewAvatar = () => setPreviewAvatar(false);
-    const closeCommentsModal = () => setCommentsModalOpen(false); 
+    const closeCommentsModal = () => setCommentsModalOpen(false);
 
     const navigator = useNavigate();
 
@@ -90,7 +104,7 @@ function Profile() {
     const formatTimeAgo = (createAt) => {
         const createTime = new Date(createAt);
         const now = new Date();
-        const diffInSeconds = Math.floor((now - createTime) / 1000); 
+        const diffInSeconds = Math.floor((now - createTime) / 1000);
 
         if (diffInSeconds < 60) {
             return `${diffInSeconds}s`;
@@ -196,17 +210,32 @@ function Profile() {
 
                                     </div>
                                     <div className="post-content"
-                                    dangerouslySetInnerHTML={{__html: article.postArticle.content}}
+                                        dangerouslySetInnerHTML={{ __html: article.postArticle.content }}
                                     />
                                 </div>
                                 {/* Hiển thị hình ảnh bài viết */}
                                 <div className="post-image">
-                                    {article.thumbnails.length > 0 ? (
-                                        article.thumbnails.map((thumbnail) => (
-                                            <img key={thumbnail} src={thumbnail} alt="Post Thumbnail" />
-                                        ))
-                                    ) : null}
+                                    {article.thumbnails.length > 0 && (
+                                        <Swiper
+                                            cssMode={true}
+                                            navigation={true}
+                                            pagination={false}
+                                            mousewheel={true}
+                                            keyboard={true}
+                                            modules={[Navigation, Pagination, Mousewheel, Keyboard]}
+                                            className="mySwiper"
+                                            slidesPerView={3} // Hiển thị 3 slide cùng lúc
+                                            spaceBetween={10} // Khoảng cách giữa các slide
+                                        >
+                                            {article.thumbnails.map((thumbnail) => (
+                                                <SwiperSlide key={thumbnail}>
+                                                    <img src={thumbnail} alt="Post Thumbnail" />
+                                                </SwiperSlide>
+                                            ))}
+                                        </Swiper>
+                                    )}
                                 </div>
+
                                 <div className="post-footer">
                                     <span className="icon"><FontAwesomeIcon icon={faHeart} /> 32</span>
                                     <span className="icon" onClick={() => { openCommentsModal(article.postArticle); console.log("Post ID clicked:", article.postArticle.postId); }}>
@@ -217,7 +246,7 @@ function Profile() {
                             </div>
                         ))
                     ) : (
-                        <p style={{textAlign: 'center', fontSize: '1.4rem', marginTop: '1rem'}}>No posts available.</p>
+                        <p style={{ textAlign: 'center', fontSize: '1.4rem', marginTop: '1rem' }}>No posts available.</p>
                     )}
                 </div>
             </div>

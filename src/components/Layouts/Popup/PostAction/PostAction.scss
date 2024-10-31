@@ -9,6 +9,7 @@
         width: 25rem;
         border: .1rem solid var(--border);
         box-shadow: 0 .5rem 1rem rgba(0, 0, 0, 0.1);
+        z-index: 9999 !important;
        
         .option-container {
             .actionBox-article {

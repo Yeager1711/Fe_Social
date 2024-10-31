@@ -59,6 +59,10 @@
         border-top-left-radius: 1rem;
         border-bottom-left-radius: 1rem;
 
+        .swiper.swiper-initialized.swiper-horizontal.mySwiper.swiper-backface-hidden {
+            height: 60rem !important;
+        }
+
         img {
             position: absolute;
             top: 0;
@@ -186,9 +190,7 @@
                     .comment-wrapper {
                         gap: .5rem;
 
-                        .wrapper-user {
-
-                        }
+                        .wrapper-user {}
                     }
 
                     p {
@@ -212,7 +214,7 @@
                     }
 
                     .comment-meta {
-                        
+
                         font-size: 1.2rem;
                         color: gray;
                         margin-top: .5rem;

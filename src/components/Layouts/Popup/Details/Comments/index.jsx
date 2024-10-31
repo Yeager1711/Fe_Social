@@ -8,6 +8,17 @@ import Cookies from "js-cookie";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart, faComment, faBookmark, faShare } from '@fortawesome/free-solid-svg-icons';
 
+import { Swiper, SwiperSlide } from 'swiper/react';
+import SwiperCore from 'swiper';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+import 'swiper/css/mousewheel';
+import 'swiper/css/keyboard';
+import 'swiper/css/autoplay';
+
+import { Pagination, Autoplay, Grid } from 'swiper/modules';
+
 const cx = classNames.bind(styles);
 const apiUrl = process.env.REACT_APP_LOCAL_API_URL;
 
@@ -106,17 +117,24 @@ function DetailModalComments({ isOpen, onClose, postId }) {
                 <div className={cx('post-details')}>
                     <div className={cx('product-post')}>
                         {thumbnails && thumbnails.length > 0 ? (
-                            thumbnails.map((thumbnail, index) => (
-                                thumbnail.endsWith('.mp4') ? (
-                                    <video key={index} className={cx('product-video')} src={thumbnail} controls />
-                                ) : (
-                                    <img key={index} className={cx('product-image')} src={thumbnail} alt="Post Thumbnail" />
-                                )
-                            ))
+                            <Swiper pagination={true} modules={[Pagination]} className="mySwiper">
+                                {thumbnails.map((thumbnail, index) => (
+                                    thumbnail.endsWith('.mp4') ? (
+                                        <SwiperSlide key={index}> {/* Đặt key tại SwiperSlide */}
+                                            <video className={cx('product-video')} src={thumbnail} controls />
+                                        </SwiperSlide>
+                                    ) : (
+                                        <SwiperSlide key={index}> {/* Đặt key tại SwiperSlide */}
+                                            <img className={cx('product-image')} src={thumbnail} alt="Post Thumbnail" />
+                                        </SwiperSlide>
+                                    )
+                                ))}
+                            </Swiper>
                         ) : (
                             <p>No media available</p>
                         )}
                     </div>
+
                     <div className={cx('wrapper-infoComment')}>
                         <div className={cx('post-info')}>
                             <div className={cx('header-comment')}>
