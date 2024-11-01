@@ -224,8 +224,8 @@ function Profile() {
                                             keyboard={true}
                                             modules={[Navigation, Pagination, Mousewheel, Keyboard]}
                                             className="mySwiper"
-                                            slidesPerView={3} // Hiển thị 3 slide cùng lúc
-                                            spaceBetween={10} // Khoảng cách giữa các slide
+                                            slidesPerView={3} 
+                                            spaceBetween={10} 
                                         >
                                             {article.thumbnails.map((thumbnail) => (
                                                 <SwiperSlide key={thumbnail}>

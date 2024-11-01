@@ -1,454 +1,149 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from './Home.scss';
 import classNames from "classnames";
 import 'aos/dist/aos.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart, faComment, faShare } from '@fortawesome/free-solid-svg-icons';
 
-import DetailModalComments from '~/components/Layouts/Popup/Details/Comments'
+// swiper
+import { Swiper, SwiperSlide } from 'swiper/react';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+import { Navigation, Pagination, Mousewheel, Keyboard } from 'swiper/modules';
+
+import DetailModalComments from '~/components/Layouts/Popup/Details/Comments';
+import PostActions from '~/components/Layouts/Popup/PostAction'
+
+import axios from "axios";
+import Cookies from "js-cookie";
 
 const cx = classNames.bind(styles);
+const apiUrl = process.env.REACT_APP_LOCAL_API_URL;
 
 function Home() {
-    const [isModalOpen, setModalOpen] = useState(false);
-    const [currentPost, setCurrentPost] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedPostData, setSelectedPostData] = useState(null);
+    const [postArticle, setPostArticle] = useState([]);
 
-    const postData = [
-        {
-            id: 8,
-            user: './images/user3.jpg',
-            userName: 'itheme_design',
-            locationTag: 'Dubai, Các Tiểu Vương quốc Ả Rập Thống nhất',
-            image: './images/iphone3.mp4',
-            likes: '106,704',
-            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam....',
-            date: 'September 21',
-            comments: [
-                {
-                    user: './images/user2.jpg',
-                    username: 'parvizsharifiy28',
-                    comment: '15-pro legend 🔥',
-                    time: '3w',
-                    likes: 25
-                },
-                {
-                    user: './images/user2.jpg',
-                    username: 'iandreamosca_',
-                    comment: 'Natural titanium team!',
-                    time: '3w',
-                    likes: 116
-                },
-                {
-                    user: './images/user2.jpg',
-                    username: 'aizul_ordep',
-                    comment: 'Can someone fulfill my dream of having an iPhone? 🙏🎉 please I am from Angola',
-                    time: '1w',
-                    likes: 1
-                }
-            ]
-        },
-        {
-            id: 7,
-            user: './images/user2.jpg',
-            userName: 'archiportfoliomaker',
-            locationTag: 'Dubai, Các Tiểu Vương quốc Ả Rập Thống nhất',
-            image: './images/iphone2.mp4',
-            likes: '106,704',
-            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam....',
-            date: 'September 21',
-            comments: [
-                {
-                    user: './images/user2.jpg',
-                    username: 'parvizsharifiy28',
-                    comment: '15-pro legend 🔥',
-                    time: '3w',
-                    likes: 25
-                },
-                {
-                    user: './images/user2.jpg',
-                    username: 'iandreamosca_',
-                    comment: 'Natural titanium team!',
-                    time: '3w',
-                    likes: 116
-                },
-                {
-                    user: './images/user2.jpg',
-                    username: 'aizul_ordep',
-                    comment: 'Can someone fulfill my dream of having an iPhone? 🙏🎉 please I am from Angola',
-                    time: '1w',
-                    likes: 1
-                }
-            ]
-        },
-        {
-            id: 4,
-            user: './images/user5.jpg',
-            userName: 'imaaduuddin',
-            locationTag: 'Dubai, Các Tiểu Vương quốc Ả Rập Thống nhất',
-            image: './images/product3.jpg',
-            likes: '6,704',
-            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam....',
-            date: 'September 21',
-            comments: [
-                {
-                    user: './images/user2.jpg',
-                    username: 'parvizsharifiy28',
-                    comment: '15-pro legend 🔥',
-                    time: '3w',
-                    likes: 25
-                },
-                {
-                    user: './images/user2.jpg',
-                    username: 'iandreamosca_',
-                    comment: 'Natural titanium team!',
-                    time: '3w',
-                    likes: 116
-                },
-                {
-                    user: './images/user2.jpg',
-                    username: 'aizul_ordep',
-                    comment: 'Can someone fulfill my dream of having an iPhone? 🙏🎉 please I am from Angola',
-                    time: '1w',
-                    likes: 1
-                }
-            ]
-        },
-        {
-            id: 5,
-            user: './images/user4.jpg',
-            userName: 'edc_tech_',
-            locationTag: 'Dubai, Các Tiểu Vương quốc Ả Rập Thống nhất',
-            image: './images/product4.jpg',
-            likes: '1,106,704',
-            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam....',
-            date: 'September 21',
-            comments: [
-                {
-                    user: './images/user2.jpg',
-                    username: 'parvizsharifiy28',
-                    comment: '15-pro legend 🔥',
-                    time: '3w',
-                    likes: 25
-                },
-                {
-                    user: './images/user2.jpg',
-                    username: 'iandreamosca_',
-                    comment: 'Natural titanium team!',
-                    time: '3w',
-                    likes: 116
-                },
-                {
-                    user: './images/user2.jpg',
-                    username: 'aizul_ordep',
-                    comment: 'Can someone fulfill my dream of having an iPhone? 🙏🎉 please I am from Angola',
-                    time: '1w',
-                    likes: 1
-                },
-                {
-                    user: './images/user2.jpg',
-                    username: 'parvizsharifiy28',
-                    comment: '15-pro legend 🔥',
-                    time: '3w',
-                    likes: 25
-                },
-                {
-                    user: './images/user2.jpg',
-                    username: 'iandreamosca_',
-                    comment: 'Natural titanium team!',
-                    time: '3w',
-                    likes: 116
-                },
-                {
-                    user: './images/user2.jpg',
-                    username: 'aizul_ordep',
-                    comment: 'Can someone fulfill my dream of having an iPhone? 🙏🎉 please I am from Angola',
-                    time: '1w',
-                    likes: 1
-                },
-                {
-                    user: './images/user2.jpg',
-                    username: 'parvizsharifiy28',
-                    comment: '15-pro legend 🔥',
-                    time: '3w',
-                    likes: 25
-                },
-                {
-                    user: './images/user2.jpg',
-                    username: 'iandreamosca_',
-                    comment: 'Natural titanium team!',
-                    time: '3w',
-                    likes: 116
-                },
-                {
-                    user: './images/user2.jpg',
-                    username: 'aizul_ordep',
-                    comment: 'Can someone fulfill my dream of having an iPhone? 🙏🎉 please I am from Angola',
-                    time: '1w',
-                    likes: 1
-                },
-                {
-                    user: './images/user2.jpg',
-                    username: 'parvizsharifiy28',
-                    comment: '15-pro legend 🔥',
-                    time: '3w',
-                    likes: 25
-                },
-                {
-                    user: './images/user2.jpg',
-                    username: 'iandreamosca_',
-                    comment: 'Natural titanium team!',
-                    time: '3w',
-                    likes: 116
-                },
-                {
-                    user: './images/user2.jpg',
-                    username: 'aizul_ordep',
-                    comment: 'Can someone fulfill my dream of having an iPhone? 🙏🎉 please I am from Angola',
-                    time: '1w',
-                    likes: 1
-                }
-            ]
-        },
-        {
-            id: 3,
-            user: './images/user2.jpg',
-            userName: 'archiportfoliomaker',
-            locationTag: 'Dubai, Các Tiểu Vương quốc Ả Rập Thống nhất',
-            image: './images/product2.jpg',
-            likes: '206,704',
-            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam....',
-            date: 'September 21',
-            comments: [
-                {
-                    user: './images/user2.jpg',
-                    username: 'parvizsharifiy28',
-                    comment: '15-pro legend 🔥',
-                    time: '3w',
-                    likes: 25
-                },
-                {
-                    user: './images/user2.jpg',
-                    username: 'iandreamosca_',
-                    comment: 'Natural titanium team!',
-                    time: '3w',
-                    likes: 116
-                },
-                {
-                    user: './images/user2.jpg',
-                    username: 'aizul_ordep',
-                    comment: 'Can someone fulfill my dream of having an iPhone? 🙏🎉 please I am from Angola',
-                    time: '1w',
-                    likes: 1
-                }
-            ]
-        },
-        {
-            id: 6,
-            user: './images/user2.jpg',
-            userName: 'archiportfoliomaker',
-            locationTag: 'Dubai, Các Tiểu Vương quốc Ả Rập Thống nhất',
-            image: './images/product5.jpg',
-            likes: '1,704',
-            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam....',
-            date: 'September 21',
-            comments: [
-                {
-                    user: './images/user2.jpg',
-                    username: 'parvizsharifiy28',
-                    comment: '15-pro legend 🔥',
-                    time: '3w',
-                    likes: 25
-                },
-                {
-                    user: './images/user2.jpg',
-                    username: 'iandreamosca_',
-                    comment: 'Natural titanium team!',
-                    time: '3w',
-                    likes: 116
-                },
-                {
-                    user: './images/user2.jpg',
-                    username: 'aizul_ordep',
-                    comment: 'Can someone fulfill my dream of having an iPhone? 🙏🎉 please I am from Angola',
-                    time: '1w',
-                    likes: 1
-                }
-            ]
-        },
-        {
-            id: 1,
-            user: './images/user6.jpg',
-            userName: 'zenjoshh',
-            locationTag: 'Dubai, Các Tiểu Vương quốc Ả Rập Thống nhất',
-            image: './images/iphone1.mp4',
-            likes: '106,704',
-            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam....',
-            date: 'September 21',
-            comments: [
-                {
-                    user: './images/user2.jpg',
-                    username: 'parvizsharifiy28',
-                    comment: '15-pro legend 🔥',
-                    time: '3w',
-                    likes: 25
-                },
-                {
-                    user: './images/user2.jpg',
-                    username: 'iandreamosca_',
-                    comment: 'Natural titanium team!',
-                    time: '3w',
-                    likes: 116
-                },
-                {
-                    user: './images/user2.jpg',
-                    username: 'aizul_ordep',
-                    comment: 'Can someone fulfill my dream of having an iPhone? 🙏🎉 please I am from Angola',
-                    time: '1w',
-                    likes: 1
-                }
-            ]
-        },
-        {
-            id: 7,
-            user: './images/user2.jpg',
-            userName: 'archiportfoliomaker',
-            locationTag: 'Dubai, Các Tiểu Vương quốc Ả Rập Thống nhất',
-            image: './images/product6.jpg',
-            likes: '704',
-            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam....',
-            date: 'September 21',
-            comments: [
-                {
-                    user: './images/user2.jpg',
-                    username: 'parvizsharifiy28',
-                    comment: '15-pro legend 🔥',
-                    time: '3w',
-                    likes: 25
-                },
-                {
-                    user: './images/user2.jpg', username: 'iandreamosca_',
-                    comment: 'Natural titanium team!',
-                    time: '3w',
-                    likes: 116
-                },
-                {
-                    user: './images/user2.jpg',
-                    username: 'aizul_ordep',
-                    comment: 'Can someone fulfill my dream of having an iPhone? 🙏🎉 please I am from Angola',
-                    time: '1w',
-                    likes: 1
-                }
-            ]
-        },
-        {
-            id: 2,
-            user: './images/user7.jpg',
-            userName: 'riceminimalist',
-            locationTag: 'Dubai, Các Tiểu Vương quốc Ả Rập Thống nhất',
-            image: './images/product1.jpg',
-            likes: '106,704',
-            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam....',
-            date: 'September 21',
-            comments: [
-                {
-                    user: './images/user2.jpg',
-                    username: 'parvizsharifiy28',
-                    comment: '15-pro legend 🔥',
-                    time: '3w',
-                    likes: 25
-                },
-                {
-                    user: './images/user2.jpg',
-                    username: 'iandreamosca_',
-                    comment: 'Natural titanium team!',
-                    time: '3w',
-                    likes: 116
-                },
-                {
-                    user: './images/user2.jpg',
-                    username: 'aizul_ordep',
-                    comment: 'Can someone fulfill my dream of having an iPhone? 🙏🎉 please I am from Angola',
-                    time: '1w',
-                    likes: 1
-                }
-            ]
-        },
-    ]
+    const closeCommentsModal = () => setIsModalOpen(false);
 
-    const handleCommentClick = (post) => {
-        setCurrentPost(post);
-        setModalOpen(true);
-    }
+    useEffect(() => {
+        const fetchPostArticle = async () => {
+            try {
+                const response = await axios.get(`${apiUrl}/post/g_postArticleAll/getAll_Article`, {
+                    headers: {
+                        Authorization: `Bearer ${Cookies.get('access_token')}`
+                    },
+                });
+                setPostArticle(response.data.data || []);
+            } catch (error) {
+                console.error("Error fetching posts:", error);
+            }
+        };
+
+        fetchPostArticle();
+    }, []);
+
+    const openCommentsModal = (post) => {
+        setSelectedPostData(post);
+        setIsModalOpen(true);
+    };
+
+    const formatTimeAgo = (createAt) => {
+        const createTime = new Date(createAt);
+        const now = new Date();
+        const diffInSeconds = Math.floor((now - createTime) / 1000);
+
+        if (diffInSeconds < 60) {
+            return `${diffInSeconds}s`;
+        } else if (diffInSeconds < 3600) {
+            return `${Math.floor(diffInSeconds / 60)}m`;
+        } else if (diffInSeconds < 86400) {
+            return `${Math.floor(diffInSeconds / 3600)}h`;
+        } else if (diffInSeconds < 2592000) {
+            return `${Math.floor(diffInSeconds / 86400)}d`;
+        } else if (diffInSeconds < 31536000) {
+            return `${Math.floor(diffInSeconds / 2592000)}mo`;
+        } else {
+            return `${Math.floor(diffInSeconds / 31536000)}y`;
+        }
+    };
 
     return (
         <div className={cx('home-container')}>
             {/* Story section */}
             <div className={cx('story-section')}>
-                <div className={cx('story-item')}>
-                    <img src="https://inuvdp.com/wp-content/uploads/2024/03/apple-vector-1.jpg" alt="Story" />
-                    <p>User Name 1</p>
-                </div>
-                <div className={cx('story-item')}>
-                    <img src="https://inuvdp.com/wp-content/uploads/2024/03/apple-vector-1.jpg" alt="Story" />
-                    <p>User Name 2</p>
-                </div>
-                <div className={cx('story-item')}>
-                    <img src="https://inuvdp.com/wp-content/uploads/2024/03/apple-vector-1.jpg" alt="Story" />
-                    <p>User Name 3</p>
-                </div>
-                <div className={cx('story-item')}>
-                    <img src="https://inuvdp.com/wp-content/uploads/2024/03/apple-vector-1.jpg" alt="Story" />
-                    <p>User Name 4</p>
-                </div>
-
-                <div className={cx('story-item')}>
-                    <img src="https://inuvdp.com/wp-content/uploads/2024/03/apple-vector-1.jpg" alt="Story" />
-                    <p>User Name 5</p>
-                </div>
-
-                <div className={cx('story-item')}>
-                    <img src="https://inuvdp.com/wp-content/uploads/2024/03/apple-vector-1.jpg" alt="Story" />
-                    <p>User Name 6</p>
-                </div>
+                {[...Array(6)].map((_, i) => (
+                    <div className={cx('story-item')} key={i}>
+                        <img src="https://inuvdp.com/wp-content/uploads/2024/03/apple-vector-1.jpg" alt="Story" />
+                        <p>User Name {i + 1}</p>
+                    </div>
+                ))}
             </div>
 
             {/* Main content section */}
             <div className={cx('main-content')}>
-                {postData && postData.map(post => (
-                    <div className={cx('post')} key={post.id}>
-                        <div className={cx('post-header')}>
-                            <img src={post.user} alt="User Avatar" className={cx('avatar')} />
-                            <div>
-                                <span>{post.userName} {post.id}</span>
-                                <p>{post.locationTag}</p>
-                            </div>
-                        </div>
-                        <div className={cx('post-product')}>
-                            {post.image.endsWith('.mp4') ? (
-                                <video className={cx('product-video')} src={post.image} controls />
-                            ) : (
-                                <img className={cx('product-image')} src={post.image} alt={post.description} />
-                            )}
-                        </div>
-                        <div className={cx('post-actions')}>
-                            <FontAwesomeIcon icon={faHeart} />
-                            <FontAwesomeIcon icon={faComment} onClick={() => handleCommentClick(post)} />
-                            <FontAwesomeIcon icon={faShare} />
-                        </div>
-                        <span className={cx('total-likes')}>{post.likes} likes</span>
-                        <span className={cx('liked-by')}>Được yêu thích bởi: <a href="yeager_1711">yeager_1711</a> và những người khác</span>
-                        <p>{post.description}</p>
-                    </div>
-                ))}
+                {postArticle && postArticle.length > 0 ? (
+                    postArticle.map((post) => (
+                        <div className={cx('post')} key={post.postId}>
+                            <div className={cx('post-header')}>
+                                <div style={{ display: 'flex', alignItems: 'center' }}>
+                                    <img src={post.account.avatar} alt="User Avatar" className={cx('avatar')} />
+                                    <div>
+                                        <span style={{ display: 'flex', alignItems: 'center' }}>
+                                            {post.account.first_name} {post.account.last_name}
+                                            <p style={{ fontWeight: '400' }}>[{formatTimeAgo(post.created_at)}]</p>
+                                        </span>
+                                        <p>{post.location}</p>
+                                    </div>
+                                </div>
 
+                                <PostActions />
+                            </div>
+                            <div className={cx('post-product')}>
+                                <Swiper
+                                    cssMode={true}
+                                    navigation={true}
+                                    pagination={false}
+                                    mousewheel={true}
+                                    keyboard={true}
+                                    modules={[Navigation, Pagination, Mousewheel, Keyboard]}
+                                    className="mySwiper"
+                                    slidesPerView={3}
+                                    spaceBetween={10}
+                                >
+                                    {post.thumbnails.map((media, index) => (
+                                        <SwiperSlide key={index}>
+                                            {media.endsWith('.mp4') ? (
+                                                <video className={cx('product-video')} src={media} controls />
+                                            ) : (
+                                                <img className={cx('product-image')} src={media} alt={post.description} />
+                                            )}
+                                        </SwiperSlide>
+                                    ))}
+                                </Swiper>
+                            </div>
+                            <div className={cx('post-actions')}>
+                                <FontAwesomeIcon icon={faHeart} />
+                                <FontAwesomeIcon icon={faComment} onClick={() => openCommentsModal(post)} />
+                                <FontAwesomeIcon icon={faShare} />
+                            </div>
+                            <span className={cx('total-likes')}>106,000 likes</span>
+                            <span className={cx('liked-by')}>Được yêu thích bởi: <a href="yeager_1711">yeager_1711</a> và những người khác</span>
+                            <p>{post.description}</p>
+                        </div>
+                    ))
+                ) : (
+                    <p style={{ textAlign: 'center', fontSize: '1.4rem', marginTop: '1rem' }}>No posts available.</p>
+                )}
             </div>
 
             <DetailModalComments
                 isOpen={isModalOpen}
-                onClose={() => setModalOpen(false)}
-                postData={currentPost}
+                onClose={closeCommentsModal}
+                postId={selectedPostData?.postId}
             />
-
         </div>
     );
 }

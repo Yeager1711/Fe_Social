@@ -29,6 +29,7 @@ import { TiDelete } from "react-icons/ti";
 const cx = classNames.bind(styles);
 
 const apiUrl = process.env.REACT_APP_LOCAL_API_URL;
+
 const Modal = ({ isOpen, onClose, addNewPost }) => {
     const [expanded, setExpanded] = useState(false);
     const [selectedIcon, setSelectedIcon] = useState(null);
@@ -165,7 +166,7 @@ const Modal = ({ isOpen, onClose, addNewPost }) => {
             onClose(); // Close modal after successful upload
         } catch (error) {
             console.error("Error posting article:", error);
-            alert("An error occurred while posting, please try again!");
+            alert("You have selected more than 10 photos, please try again.");
         } finally {
             setIsUploading(false);
         }
@@ -257,7 +258,9 @@ const Modal = ({ isOpen, onClose, addNewPost }) => {
                                         onChange={handlePostInfoChange}
                                         placeholder="Enter post details here..."
                                         className={cx('post-textarea')}
+                                        
                                     />
+                                    
                                     <div className={cx('word-count')}>
                                         {`${postInfo.length} / 2,200 ký tự`}
                                     </div>
