@@ -26,7 +26,11 @@ function Home() {
     const [selectedPostData, setSelectedPostData] = useState(null);
     const [postArticle, setPostArticle] = useState([]);
 
-    const closeCommentsModal = () => setIsModalOpen(false);
+    const closeCommentsModal = () => {
+        setSelectedPostData(null);
+        setIsModalOpen(false);
+    };
+
 
     useEffect(() => {
         const fetchPostArticle = async () => {
@@ -91,7 +95,7 @@ function Home() {
                                 <div style={{ display: 'flex', alignItems: 'center' }}>
                                     <img src={post.account.avatar} alt="User Avatar" className={cx('avatar')} />
                                     <div>
-                                        <span style={{ display: 'flex', alignItems: 'center' }}>
+                                        <span className={cx('header-name')}>
                                             {post.account.first_name} {post.account.last_name}
                                             <p style={{ fontWeight: '400' }}>[{formatTimeAgo(post.created_at)}]</p>
                                         </span>

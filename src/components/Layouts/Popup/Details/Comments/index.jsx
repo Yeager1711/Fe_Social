@@ -57,6 +57,9 @@ function DetailModalComments({ isOpen, onClose, postId }) {
     const fetchPostData = async () => {
         try {
             if (postId) {
+                // Mảng rỗng làm mới dữ liệu để cập nhật khi bài postId thay đổi
+                setCommentsPost([]);
+                
                 const postResponse = await axios.get(`${apiUrl}/post/g_postArticleID/getPost/${postId}`, {
                     headers: { Authorization: `Bearer ${Cookies.get('access_token')}` },
                 });
@@ -80,10 +83,12 @@ function DetailModalComments({ isOpen, onClose, postId }) {
     };
 
     useEffect(() => {
-        if (isOpen) {
+        if (isOpen && postId) {
             fetchPostData();
         }
     }, [isOpen, postId]);
+
+
 
     if (!isOpen || !postData) return null;
 
@@ -119,12 +124,12 @@ function DetailModalComments({ isOpen, onClose, postId }) {
                 `${apiUrl}/likes/post/createLikes_PostID/${postId}`,
                 {},
                 {
-                    headers: { 
-                        Authorization: `Bearer ${Cookies.get('access_token')}` 
+                    headers: {
+                        Authorization: `Bearer ${Cookies.get('access_token')}`
                     },
                 }
             );
-    
+
             // Toggle the like status and update the count based on current state
             setIsLiked(!isLiked);
             setLikeCount(prevCount => isLiked ? prevCount - 1 : prevCount + 1);
@@ -133,7 +138,6 @@ function DetailModalComments({ isOpen, onClose, postId }) {
             console.error('Error toggling like:', error);
         }
     };
-    
 
     return (
         <div className={cx('modal-overlay')} onClick={onClose}>
@@ -221,9 +225,9 @@ function DetailModalComments({ isOpen, onClose, postId }) {
                                 </div>
                             </div>
                             <div className={cx('action')}>
-                                <div style={{display: 'flex'}}>
+                                <div style={{ display: 'flex' }}>
                                     <div onClick={handleToggleLike} style={{ cursor: 'pointer' }}>
-                                    
+
                                         <FontAwesomeIcon icon={faHeart} color={isLiked ? 'red' : 'gray'} />
                                     </div>
                                     <div>

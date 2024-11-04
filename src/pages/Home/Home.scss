@@ -63,11 +63,13 @@
                     object-fit: cover;
                 }
 
-                span {
+                .header-name {
                     font-weight: bold;
                     font-size: 1.4rem;
                     display: block;
                     padding: 0 1rem;
+                    display: flex;
+                    align-items: center;
                 }
 
                 p {
@@ -86,6 +88,7 @@
                 object-fit: cover;
                 margin-bottom: 1rem;
                 border-radius: 1rem;
+                border: .1rem solid #fcf2f2;
             }
 
             video {
