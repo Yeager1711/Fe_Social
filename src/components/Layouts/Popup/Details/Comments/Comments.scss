@@ -208,7 +208,7 @@
                     }
 
                     .text-content {
-                        width: 29rem;
+                        width: 26rem;
                         margin-left: .5rem;
                         font-weight: 400;
                     }
@@ -247,6 +247,9 @@
             }
 
             .post-info-bottom {
+                display: flex;
+                align-items: center;
+                gap: .5rem;
 
                 p {
                     font-size: 1.4rem;

@@ -6,7 +6,7 @@ import { faX } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
 import Cookies from "js-cookie";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHeart, faComment, faBookmark, faShare } from '@fortawesome/free-solid-svg-icons';
+import { faComment, faHeart, faBookmark, faShare } from '@fortawesome/free-solid-svg-icons';
 
 import { Swiper, SwiperSlide } from 'swiper/react';
 import SwiperCore from 'swiper';
@@ -19,6 +19,8 @@ import 'swiper/css/autoplay';
 
 import { Pagination, Autoplay, Grid } from 'swiper/modules';
 
+import { CiHeart } from "react-icons/ci";
+
 const cx = classNames.bind(styles);
 const apiUrl = process.env.REACT_APP_LOCAL_API_URL;
 
@@ -27,6 +29,8 @@ function DetailModalComments({ isOpen, onClose, postId }) {
     const [error, setError] = useState(null);
     const [comment, setComment] = useState("");
     const [commentsPost, setCommentsPost] = useState([]);
+    const [isLiked, setIsLiked] = useState(false); // Track like status
+    const [likeCount, setLikeCount] = useState(0); // Track number of likes
 
     const navigate = useNavigate();
 
@@ -66,6 +70,9 @@ function DetailModalComments({ isOpen, onClose, postId }) {
                     (a, b) => new Date(b.created_at) - new Date(a.created_at)
                 )
                 setCommentsPost(sortedComments);
+
+                // Set initial like count based on post data, if available
+                setLikeCount(postResponse.data[0].likeCount || 0);
             }
         } catch (err) {
             setError(err.response ? err.response.data : "An error occurred");
@@ -106,9 +113,27 @@ function DetailModalComments({ isOpen, onClose, postId }) {
         }
     };
 
-    // const handleProfileClick = () => {
-    //     navigate(`/SocializeIt/profile/@${username}`);
-    // };
+    const handleToggleLike = async () => {
+        try {
+            const response = await axios.post(
+                `${apiUrl}/likes/post/createLikes_PostID/${postId}`,
+                {},
+                {
+                    headers: { 
+                        Authorization: `Bearer ${Cookies.get('access_token')}` 
+                    },
+                }
+            );
+    
+            // Toggle the like status and update the count based on current state
+            setIsLiked(!isLiked);
+            setLikeCount(prevCount => isLiked ? prevCount - 1 : prevCount + 1);
+            console.log(response.data.message); // Logs "Like added" or "Like removed"
+        } catch (error) {
+            console.error('Error toggling like:', error);
+        }
+    };
+    
 
     return (
         <div className={cx('modal-overlay')} onClick={onClose}>
@@ -196,17 +221,27 @@ function DetailModalComments({ isOpen, onClose, postId }) {
                                 </div>
                             </div>
                             <div className={cx('action')}>
-                                <div>
-                                    <FontAwesomeIcon icon={faHeart} />
-                                    <FontAwesomeIcon icon={faComment} />
-                                    <FontAwesomeIcon icon={faShare} />
+                                <div style={{display: 'flex'}}>
+                                    <div onClick={handleToggleLike} style={{ cursor: 'pointer' }}>
+                                    
+                                        <FontAwesomeIcon icon={faHeart} color={isLiked ? 'red' : 'gray'} />
+                                    </div>
+                                    <div>
+                                        <FontAwesomeIcon icon={faComment} />
+                                    </div>
+                                    <div>
+                                        <FontAwesomeIcon icon={faShare} />
+                                    </div>
                                 </div>
                                 <div>
                                     <FontAwesomeIcon icon={faBookmark} />
                                 </div>
                             </div>
                             <div className={cx('post-info-bottom')}>
-                                <p>101.787 likes</p>
+                                <div className={cx('post-info-bottom')}>
+                                    <p>{likeCount} likes || {commentsPost.length} comments</p>
+                                </div>
+
                             </div>
                             <div className={cx('box-commentPost')}>
                                 <input
