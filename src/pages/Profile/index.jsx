@@ -17,6 +17,7 @@ import axios from "axios";
 import { Navigate, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPencil, faUsers, faPenToSquare } from '@fortawesome/free-solid-svg-icons';
+import { faX } from '@fortawesome/free-solid-svg-icons';
 import { faFacebook, faInstagram, } from '@fortawesome/free-brands-svg-icons';
 import { faHeart, faEllipsis, faComment, faShare, faBookmark, faThumbtack, faTrash } from '@fortawesome/free-solid-svg-icons';
 
@@ -25,7 +26,8 @@ import PreviewAvatar from '~/components/Layouts/Popup/PreviewAvatar';
 import DetailModalComments from '~/components/Layouts/Popup/Details/Comments';
 import PostActions from '~/components/Layouts/Popup/PostAction'
 
-
+import {formatTimeAgo } from '~/ultis/formatTimeAgo'
+import { CiCirclePlus } from "react-icons/ci";
 
 import Cookies from "js-cookie";
 
@@ -101,22 +103,6 @@ function Profile() {
         setCommentsModalOpen(true); // Open the comments modal
     };
 
-    const formatTimeAgo = (createAt) => {
-        const createTime = new Date(createAt);
-        const now = new Date();
-        const diffInSeconds = Math.floor((now - createTime) / 1000);
-
-        if (diffInSeconds < 60) {
-            return `${diffInSeconds}s`;
-        } else if (diffInSeconds < 3600) {
-            const minutes = Math.floor(diffInSeconds / 60);
-            return `${minutes}m`;
-        } else {
-            const hours = Math.floor(diffInSeconds / 3600);
-            return `${hours}h`;
-        }
-    };
-
 
 
     return (
@@ -151,8 +137,7 @@ function Profile() {
                 <button className={cx('edit-profile')} onClick={openEditProfile}>Edit profile</button>
                 <nav className={cx('profile-tabs')}>
                     <span className={cx('active')}>Post</span>
-                    <span>Replies</span>
-                    <span>Reposts</span>
+                    <span>Save</span>
                 </nav>
                 <div className={cx('new-thread')}>
                     <div>

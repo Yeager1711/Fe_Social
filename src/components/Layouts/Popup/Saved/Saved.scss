@@ -1,0 +1,62 @@
+.model-SavedFolder {
+    background: var(--background);
+    padding: 2rem;
+    border-radius: 1rem;
+    max-width: 50rem;
+    width: 95%;
+
+    .header-SavedFolder {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        padding-bottom: 1.5rem;
+        border-bottom: .1rem solid #dbdbdb;
+        position: relative;
+        
+        
+        .title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            h3,
+            span {
+                cursor: pointer;
+                font-size: 1.7rem;
+                text-transform: none;
+
+                svg {
+                    font-size: 2.5rem;
+                }
+            }
+        }
+
+        .input-addFolder {
+            margin-top: 1rem;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease, opacity 0.5s ease;
+            opacity: 0;
+            
+            &.visible {
+                max-height: 4rem; 
+                opacity: 1;
+            }
+            input {
+                padding: .7rem 1.5rem;
+                border: .1rem solid var(--border);
+                width: 100%;
+                border-radius: .5rem;
+
+                &:focus {
+                    border-color: #98a7cf;
+                }
+            }
+        }
+    }
+
+    .savedFolder-container {
+        height: 30rem;
+    }
+}

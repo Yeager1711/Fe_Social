@@ -70,6 +70,7 @@
 
   .footer-header {
     height: calc(100vh - 90vh);
+    position: relative;
 
     .btn-moreOption {
       font-size: 1.5rem;
@@ -94,6 +95,44 @@
         font-weight: bold;
         border-bottom: 2px solid var(--colorActive);
 
+      }
+    }
+
+    .MoreHeader {
+      position: absolute;
+      bottom: 7rem;
+      left: 2rem;
+      background: var(--background);
+      padding: 1.3rem;
+      border-radius: 1rem;
+      box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .1);
+      width: 25rem;
+
+      .action-button {
+        display: block;
+        padding: 1.7rem ;
+        margin: 0 0 1rem 0;
+        background: none;
+        font-size: 1.4rem;
+        cursor: pointer;
+        align-items: center;
+        border-bottom: .3rem solid var(--bg-hover);
+
+        &:last-child {
+          margin: 0;
+          border-bottom: none;
+        }
+
+        svg {
+          margin-bottom: -.4rem;
+          margin-right: .5rem;
+          font-size: 2rem;
+        }
+
+        &:hover {
+          background: var(--bg-hover);
+          border-radius: 1rem;
+        }
       }
     }
   }

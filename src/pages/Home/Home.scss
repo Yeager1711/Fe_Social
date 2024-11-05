@@ -119,6 +119,11 @@
                 font-weight: 550;
             }
 
+            .content {
+                display: flex;
+                align-items: center;
+            }
+
             .liked-by {
                 padding: 1rem;
                 font-size: 1.4rem;

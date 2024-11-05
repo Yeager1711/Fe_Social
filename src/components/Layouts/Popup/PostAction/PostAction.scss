@@ -38,10 +38,16 @@
                 margin-bottom: 1rem;
                 cursor: pointer;
                 font-weight: 400 !important;
+                font-size: 1.3rem;
+
+                svg {
+                    font-size: 1.6rem;
+                }
                 
                 &:last-child {
                     margin-bottom: 0;
                     color: red;
+                    font-size: 1.3rem;
                 }
 
                 &:nth-child(1),

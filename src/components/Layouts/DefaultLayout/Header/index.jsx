@@ -5,9 +5,18 @@ import classNames from 'classnames/bind';
 import styles from './Header.Module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars, faHouse, faMagnifyingGlass, faPaperclip, faHeart, faSquarePlus } from '@fortawesome/free-solid-svg-icons';
+
+// import components
 import Modal from '~/components/Layouts/Popup/create-post';
 import Notifications from '~/components/Layouts/Popup/Notifications';
 import Search from '~/components/Layouts/Popup/Search';
+import MoreHeader  from '../../Popup/More-Header';
+
+// icons React
+import { CiSettings } from "react-icons/ci";
+import { CiBookmark } from "react-icons/ci";
+import { IoIosLogOut } from "react-icons/io";
+import { IoSunnyOutline } from "react-icons/io5";
 
 //apiRequestWithAuth
 import { apiRequestWithAuth } from '~/ultis/auth'
@@ -24,6 +33,7 @@ function Header() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalOpenNotifications, setIsModalOpenNotifications] = useState(false);
   const [isModalOpenSearch, setIsModalOpenSearch] = useState(false);
+  const [isMoreHeaderOpen, setIsMoreHeaderOpen] = useState(false)
   const [username, setUsername] = useState('');
   const [avatar, setAvatar] = useState({});
 
@@ -47,6 +57,9 @@ function Header() {
           }
         })
         .catch((error) => console.error('Error fetching user data:', error));
+    }else {
+      setUsername('')
+      setAvatar('')
     }
   }, [location, Cookies.get('access_token')]);
 
@@ -83,6 +96,10 @@ function Header() {
       navigate('/SocializeIt/auth/login');
     }
   };
+
+  const toggleMoreHeader = () =>{
+    setIsMoreHeaderOpen(!isMoreHeaderOpen)
+  }
 
   return (
     <header className={cx('wrapper-header')}>
@@ -141,11 +158,13 @@ function Header() {
 
       <div className={cx('footer-header')}>
         <button className={cx('btn-moreOption', { 'active': activeItem === 'more' })}
-          onClick={() => handleActiveItem('more')}
+          onClick={toggleMoreHeader}
         >
           <FontAwesomeIcon icon={faBars} />
           more
         </button>
+
+        {isMoreHeaderOpen && <MoreHeader onClose={() => setIsMoreHeaderOpen(false)} />}
       </div>
 
       <Modal isOpen={isModalOpen} onClose={closeModal} />

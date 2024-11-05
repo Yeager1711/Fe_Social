@@ -1,13 +1,20 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBookmark, faThumbtack, faHeart, faTrash, faEllipsis } from '@fortawesome/free-solid-svg-icons';
+import { faThumbtack, faHeart, faTrash, faEllipsis } from '@fortawesome/free-solid-svg-icons';
 import styles from './PostAction.scss';
 import classNames from 'classnames/bind';
+import { MdEdit } from "react-icons/md";
+import { IoHeartDislikeOutline } from "react-icons/io5";
+import { CiBookmark } from "react-icons/ci";
+
+// Import SavedPost component
+import SavedPost from '../Saved';
 
 const cx = classNames.bind(styles);
 
 function PostActions() {
     const [showOptions, setShowOptions] = useState(false);
+    const [showModal, setShowModal] = useState(false); // State to control modal visibility
     const optionsRef = useRef(null);
 
     const toggleOptions = () => {
@@ -31,6 +38,15 @@ function PostActions() {
         };
     }, [showOptions]);
 
+    const openModal = () => {
+        setShowModal(true);
+        setShowOptions(false); // Close the options menu when modal opens
+    };
+
+    const closeModal = () => {
+        setShowModal(false);
+    };
+
     return (
         <div className={cx('action')}>
             <FontAwesomeIcon
@@ -41,9 +57,13 @@ function PostActions() {
             {showOptions && (
                 <div ref={optionsRef} className={cx('option')}>
                     <div className={cx('option-container')}>
-                        <div className={cx('actionBox-article')}>
+                        <div className={cx('actionBox-article')} onClick={openModal}>
                             <span>Save</span>
-                            <span><FontAwesomeIcon icon={faBookmark} /></span>
+                            <span><CiBookmark /></span>
+                        </div>
+                        <div className={cx('actionBox-article')}>
+                            <span>Edit post</span>
+                            <span><MdEdit /></span>
                         </div>
                         <div className={cx('actionBox-article')}>
                             <span>Pin to profile</span>
@@ -51,7 +71,7 @@ function PostActions() {
                         </div>
                         <div className={cx('actionBox-article')}>
                             <span>Hide like and share count</span>
-                            <span><FontAwesomeIcon icon={faHeart} /></span>
+                            <span><IoHeartDislikeOutline /></span>
                         </div>
                         <div className={cx('actionBox-article')}>
                             <span>Delete</span>
@@ -60,6 +80,8 @@ function PostActions() {
                     </div>
                 </div>
             )}
+            
+            {showModal && <SavedPost onClose={closeModal} />} {/* Render SavedPost modal */}
         </div>
     );
 }

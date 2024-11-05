@@ -236,12 +236,13 @@
 
                 svg {
                     padding: .5rem;
-                    font-size: 2.2rem;
+                    font-size: 2rem;
                     margin-right: .5rem;
                     cursor: pointer;
 
                     &:last-child {
                         margin: 0;
+                        font-size: 2rem;
                     }
                 }
             }

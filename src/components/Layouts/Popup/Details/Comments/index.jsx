@@ -5,8 +5,14 @@ import classNames from 'classnames/bind';
 import { faX } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
 import Cookies from "js-cookie";
+import {jwtDecode} from "jwt-decode";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faComment, faHeart, faBookmark, faShare } from '@fortawesome/free-solid-svg-icons';
+import { faComment, faBookmark, faHeart, faShare } from '@fortawesome/free-solid-svg-icons';
+
+import {formatTimeAgo } from '~/ultis/formatTimeAgo'
+
+// icons React
+import { CiBookmark } from "react-icons/ci";
 
 import { Swiper, SwiperSlide } from 'swiper/react';
 import SwiperCore from 'swiper';
@@ -32,55 +38,48 @@ function DetailModalComments({ isOpen, onClose, postId }) {
     const [isLiked, setIsLiked] = useState(false); // Track like status
     const [likeCount, setLikeCount] = useState(0); // Track number of likes
 
-    const navigate = useNavigate();
+    const Access_token = Cookies.get('access_token');
+    const currentAccountId = Access_token ? jwtDecode(Access_token).accountId : null
 
-    const formatTimeAgo = (createAt) => {
-        const createTime = new Date(createAt);
-        const now = new Date();
-        const diffInSeconds = Math.floor((now - createTime) / 1000);
+   const fetchPostData = async () => {
+    try {
+        if (postId) {
+            setCommentsPost([]);
 
-        if (diffInSeconds < 60) {
-            return `${diffInSeconds}s`;
-        } else if (diffInSeconds < 3600) {
-            return `${Math.floor(diffInSeconds / 60)}m`;
-        } else if (diffInSeconds < 86400) {
-            return `${Math.floor(diffInSeconds / 3600)}h`;
-        } else if (diffInSeconds < 2592000) {
-            return `${Math.floor(diffInSeconds / 86400)}d`;
-        } else if (diffInSeconds < 31536000) {
-            return `${Math.floor(diffInSeconds / 2592000)}mo`;
-        } else {
-            return `${Math.floor(diffInSeconds / 31536000)}y`;
+            // Fetch post data
+            const postResponse = await axios.get(`${apiUrl}/post/g_postArticleID/getPost/${postId}`, {
+                headers: { Authorization: `Bearer ${Cookies.get('access_token')}` },
+            });
+
+            const post = postResponse.data[0];
+            setPostData(post);
+
+            // Fetch comments
+            const commentsResponse = await axios.get(`${apiUrl}/comments/get/getComments_PostID/${postId}`, {
+                headers: { Authorization: `Bearer ${Cookies.get('access_token')}` },
+            });
+
+            const sortedComments = commentsResponse.data.sort(
+                (a, b) => new Date(b.created_at) - new Date(a.created_at)
+            );
+
+            setCommentsPost(sortedComments);
+
+            // Fetch like count and like status for the current user
+            const likesResponse = await axios.get(`${apiUrl}/likes/get/getLikes_PostID/${postId}`, {
+                headers: { Authorization: `Bearer ${Cookies.get('access_token')}` },
+            });
+            setLikeCount(likesResponse.data.likeCount);
+
+            // Check if the current user has already liked the post
+            const userHasLiked = likesResponse.data.likes.some(like => like.accountId === currentAccountId); // Assuming `isLikedByUser` tells if current user liked
+            setIsLiked(userHasLiked); // Set initial like status based on backend response
         }
-    };
+    } catch (err) {
+        setError(err.response ? err.response.data : "An error occurred");
+    }
+};
 
-    const fetchPostData = async () => {
-        try {
-            if (postId) {
-                // Mảng rỗng làm mới dữ liệu để cập nhật khi bài postId thay đổi
-                setCommentsPost([]);
-                
-                const postResponse = await axios.get(`${apiUrl}/post/g_postArticleID/getPost/${postId}`, {
-                    headers: { Authorization: `Bearer ${Cookies.get('access_token')}` },
-                });
-                setPostData(postResponse.data[0]);
-
-                const commentsResponse = await axios.get(`${apiUrl}/comments/get/getComments_PostID/${postId}`, {
-                    headers: { Authorization: `Bearer ${Cookies.get('access_token')}` },
-                });
-
-                const sortedComments = commentsResponse.data.sort(
-                    (a, b) => new Date(b.created_at) - new Date(a.created_at)
-                )
-                setCommentsPost(sortedComments);
-
-                // Set initial like count based on post data, if available
-                setLikeCount(postResponse.data[0].likeCount || 0);
-            }
-        } catch (err) {
-            setError(err.response ? err.response.data : "An error occurred");
-        }
-    };
 
     useEffect(() => {
         if (isOpen && postId) {
@@ -230,9 +229,7 @@ function DetailModalComments({ isOpen, onClose, postId }) {
 
                                         <FontAwesomeIcon icon={faHeart} color={isLiked ? 'red' : 'gray'} />
                                     </div>
-                                    <div>
-                                        <FontAwesomeIcon icon={faComment} />
-                                    </div>
+                                    
                                     <div>
                                         <FontAwesomeIcon icon={faShare} />
                                     </div>

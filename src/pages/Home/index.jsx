@@ -13,10 +13,13 @@ import 'swiper/css/pagination';
 import { Navigation, Pagination, Mousewheel, Keyboard } from 'swiper/modules';
 
 import DetailModalComments from '~/components/Layouts/Popup/Details/Comments';
-import PostActions from '~/components/Layouts/Popup/PostAction'
+import PostActions from '~/components/Layouts/Popup/PostAction';
+
+import {formatTimeAgo } from '~/ultis/formatTimeAgo'
 
 import axios from "axios";
 import Cookies from "js-cookie";
+import { jwtDecode } from "jwt-decode";
 
 const cx = classNames.bind(styles);
 const apiUrl = process.env.REACT_APP_LOCAL_API_URL;
@@ -25,12 +28,42 @@ function Home() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedPostData, setSelectedPostData] = useState(null);
     const [postArticle, setPostArticle] = useState([]);
+    const [likeData, setLikeData] = useState([]); // To store like status and counts for each post
 
-    const closeCommentsModal = () => {
-        setSelectedPostData(null);
-        setIsModalOpen(false);
+    const Access_token = Cookies.get('access_token');
+    const currentAccountId = Access_token ? jwtDecode(Access_token).accountId : null
+
+
+
+    const handleToggleLike = async (postId) => {
+        try {
+            const response = await axios.post(
+                `${apiUrl}/likes/post/createLikes_PostID/${postId}`,
+                {},
+                {
+                    headers: {
+                        Authorization: `Bearer ${Cookies.get('access_token')}`
+                    },
+                }
+            );
+
+            // Toggle the like status and update the count based on current state
+            const updatedLikeData = likeData.map((item) => {
+                if (item.postId === postId) {
+                    return {
+                        ...item,
+                        isLiked: !item.isLiked,
+                        likeCount: item.isLiked ? item.likeCount - 1 : item.likeCount + 1
+                    };
+                }
+                return item;
+            });
+            setLikeData(updatedLikeData);
+            console.log(response.data.message); // Logs "Like added" or "Like removed"
+        } catch (error) {
+            console.error('Error toggling like:', error);
+        }
     };
-
 
     useEffect(() => {
         const fetchPostArticle = async () => {
@@ -40,7 +73,23 @@ function Home() {
                         Authorization: `Bearer ${Cookies.get('access_token')}`
                     },
                 });
-                setPostArticle(response.data.data || []);
+                const posts = response.data.data || [];
+
+                // Fetch likes for each post
+                const likesData = await Promise.all(posts.map(async (post) => {
+                    const likesResponse = await axios.get(`${apiUrl}/likes/get/getLikes_PostID/${post.postId}`, {
+                        headers: { Authorization: `Bearer ${Cookies.get('access_token')}` },
+                    });
+                    const userHasLiked = likesResponse.data.likes.some(like => like.accountId === currentAccountId)
+                    return {
+                        postId: post.postId,
+                        likeCount: likesResponse.data.likeCount,
+                        isLiked: userHasLiked
+                    };
+                }));
+
+                setPostArticle(posts);
+                setLikeData(likesData); // Set the like data for all posts
             } catch (error) {
                 console.error("Error fetching posts:", error);
             }
@@ -54,24 +103,9 @@ function Home() {
         setIsModalOpen(true);
     };
 
-    const formatTimeAgo = (createAt) => {
-        const createTime = new Date(createAt);
-        const now = new Date();
-        const diffInSeconds = Math.floor((now - createTime) / 1000);
-
-        if (diffInSeconds < 60) {
-            return `${diffInSeconds}s`;
-        } else if (diffInSeconds < 3600) {
-            return `${Math.floor(diffInSeconds / 60)}m`;
-        } else if (diffInSeconds < 86400) {
-            return `${Math.floor(diffInSeconds / 3600)}h`;
-        } else if (diffInSeconds < 2592000) {
-            return `${Math.floor(diffInSeconds / 86400)}d`;
-        } else if (diffInSeconds < 31536000) {
-            return `${Math.floor(diffInSeconds / 2592000)}mo`;
-        } else {
-            return `${Math.floor(diffInSeconds / 31536000)}y`;
-        }
+    const closeCommentsModal = () => {
+        setSelectedPostData(null);
+        setIsModalOpen(false);
     };
 
     return (
@@ -89,55 +123,64 @@ function Home() {
             {/* Main content section */}
             <div className={cx('main-content')}>
                 {postArticle && postArticle.length > 0 ? (
-                    postArticle.map((post) => (
-                        <div className={cx('post')} key={post.postId}>
-                            <div className={cx('post-header')}>
-                                <div style={{ display: 'flex', alignItems: 'center' }}>
-                                    <img src={post.account.avatar} alt="User Avatar" className={cx('avatar')} />
+                    postArticle.map((post) => {
+                        const currentLikeData = likeData.find(item => item.postId === post.postId) || {};
+                        return (
+                            <div className={cx('post')} key={post.postId}>
+                                <div className={cx('post-header')}>
+                                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                                        <img src={post.account.avatar} alt="User Avatar" className={cx('avatar')} />
+                                        <div>
+                                            <span className={cx('header-name')}>
+                                                {post.account.first_name} {post.account.last_name}
+                                                <p style={{ fontWeight: '400' }}>[{formatTimeAgo(post.created_at)}]</p>
+                                            </span>
+                                            <p>{post.location}</p>
+                                        </div>
+                                    </div>
+
+                                    <PostActions />
+                                </div>
+                                <div className={cx('post-product')}>
+                                    <Swiper
+                                        cssMode={true}
+                                        navigation={true}
+                                        pagination={false}
+                                        mousewheel={true}
+                                        keyboard={true}
+                                        modules={[Navigation, Pagination, Mousewheel, Keyboard]}
+                                        className="mySwiper"
+                                        slidesPerView={3}
+                                        spaceBetween={10}
+                                    >
+                                        {post.thumbnails.map((media, index) => (
+                                            <SwiperSlide key={index}>
+                                                {media.endsWith('.mp4') ? (
+                                                    <video className={cx('product-video')} src={media} controls />
+                                                ) : (
+                                                    <img className={cx('product-image')} src={media} alt={post.description} />
+                                                )}
+                                            </SwiperSlide>
+                                        ))}
+                                    </Swiper>
+                                </div>
+                                <div className={cx('post-actions')}>
+                                    <div onClick={() => handleToggleLike(post.postId)} style={{ cursor: 'pointer' }}>
+                                        <FontAwesomeIcon icon={faHeart} color={currentLikeData.isLiked ? 'red' : 'gray'} />
+                                    </div>
                                     <div>
-                                        <span className={cx('header-name')}>
-                                            {post.account.first_name} {post.account.last_name}
-                                            <p style={{ fontWeight: '400' }}>[{formatTimeAgo(post.created_at)}]</p>
-                                        </span>
-                                        <p>{post.location}</p>
+                                        <FontAwesomeIcon icon={faComment} onClick={() => openCommentsModal(post)} />
+                                    </div>
+                                    <div>
+                                        <FontAwesomeIcon icon={faShare} />
                                     </div>
                                 </div>
-
-                                <PostActions />
+                                <span className={cx('total-likes')}>{currentLikeData.likeCount || 0} likes</span>
+                                <span className={cx('liked-by')}>Được yêu thích bởi: <a href="yeager_1711">yeager_1711</a> và những người khác</span>
+                                <p>{post.description}</p>
                             </div>
-                            <div className={cx('post-product')}>
-                                <Swiper
-                                    cssMode={true}
-                                    navigation={true}
-                                    pagination={false}
-                                    mousewheel={true}
-                                    keyboard={true}
-                                    modules={[Navigation, Pagination, Mousewheel, Keyboard]}
-                                    className="mySwiper"
-                                    slidesPerView={3}
-                                    spaceBetween={10}
-                                >
-                                    {post.thumbnails.map((media, index) => (
-                                        <SwiperSlide key={index}>
-                                            {media.endsWith('.mp4') ? (
-                                                <video className={cx('product-video')} src={media} controls />
-                                            ) : (
-                                                <img className={cx('product-image')} src={media} alt={post.description} />
-                                            )}
-                                        </SwiperSlide>
-                                    ))}
-                                </Swiper>
-                            </div>
-                            <div className={cx('post-actions')}>
-                                <FontAwesomeIcon icon={faHeart} />
-                                <FontAwesomeIcon icon={faComment} onClick={() => openCommentsModal(post)} />
-                                <FontAwesomeIcon icon={faShare} />
-                            </div>
-                            <span className={cx('total-likes')}>106,000 likes</span>
-                            <span className={cx('liked-by')}>Được yêu thích bởi: <a href="yeager_1711">yeager_1711</a> và những người khác</span>
-                            <p>{post.description}</p>
-                        </div>
-                    ))
+                        );
+                    })
                 ) : (
                     <p style={{ textAlign: 'center', fontSize: '1.4rem', marginTop: '1rem' }}>No posts available.</p>
                 )}
