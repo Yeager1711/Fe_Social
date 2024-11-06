@@ -30,6 +30,7 @@ import { formatTimeAgo } from '~/ultis/formatTimeAgo'
 import { CiCirclePlus } from "react-icons/ci";
 
 import Cookies from "js-cookie";
+import {jwtDecode} from "jwt-decode";
 
 import { checkAccessToken } from "~/ultis/checkTokenValid";
 
@@ -129,8 +130,12 @@ function Profile() {
         setActiveTab(tab);
     };
 
-    const handleFolderClick = async (folderId) => {
+    const handleFolderClick = async (folderId, name_folder) => {
         setActiveFolderId(folderId);
+        if (userData?.username) {
+            // Navigate to the specific folder
+            navigator(`/SocializeIt/profile/@${userData.username}/saved/${name_folder}/${folderId}`);
+        }
     };
 
 
@@ -286,7 +291,7 @@ function Profile() {
                                     <div
                                         key={folder.folderId}
                                         className={cx('box-folderSave', { active: folder.folderId === activeFolderId })}
-                                        onClick={() => handleFolderClick(folder.folderId)}
+                                        onClick={() => handleFolderClick(folder.folderId, folder.name_folder)}
                                     >
                                         <h4>{folder.name_folder}</h4>
                                     </div>

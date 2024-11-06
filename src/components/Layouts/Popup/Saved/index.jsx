@@ -103,7 +103,7 @@ function SavedPost({ onClose, postId }) {
 
             // Display error message using SweetAlert
             Swal.fire({
-                icon: 'error',
+                icon: 'warning',
                 title: 'Error!',
                 text: errorMessage,
             });
