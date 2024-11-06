@@ -12,7 +12,7 @@ import SavedPost from '../Saved';
 
 const cx = classNames.bind(styles);
 
-function PostActions() {
+function PostActions({postId}) {
     const [showOptions, setShowOptions] = useState(false);
     const [showModal, setShowModal] = useState(false); // State to control modal visibility
     const optionsRef = useRef(null);
@@ -57,8 +57,13 @@ function PostActions() {
             {showOptions && (
                 <div ref={optionsRef} className={cx('option')}>
                     <div className={cx('option-container')}>
+                        {/* <div className={cx('actionBox-article')} onClick={openModal}>
+                            <span>PostId: {postId}</span>
+                            <span></span>
+                         
+                        </div> */}
                         <div className={cx('actionBox-article')} onClick={openModal}>
-                            <span>Save</span>
+                            <span>Save </span>
                             <span><CiBookmark /></span>
                         </div>
                         <div className={cx('actionBox-article')}>
@@ -80,8 +85,12 @@ function PostActions() {
                     </div>
                 </div>
             )}
-            
-            {showModal && <SavedPost onClose={closeModal} />} {/* Render SavedPost modal */}
+
+            {showModal && 
+            <SavedPost
+                postId = {postId}
+                onClose={closeModal} 
+            />} {/* Render SavedPost modal */}
         </div>
     );
 }

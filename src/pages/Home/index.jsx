@@ -139,7 +139,9 @@ function Home() {
                                         </div>
                                     </div>
 
-                                    <PostActions />
+                                    <PostActions 
+                                    postId={post.postId}
+                                    />
                                 </div>
                                 <div className={cx('post-product')}>
                                     <Swiper

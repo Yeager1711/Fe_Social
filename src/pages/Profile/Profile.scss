@@ -358,3 +358,50 @@
 
 }
 
+.savedFolder-container {
+    overflow: auto;
+
+    &::-webkit-scrollbar {
+        background: #dbdbdb;
+        height: .1rem;
+        width: .7rem;
+        border-radius: 1rem;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        height: .1rem;
+        width: .3rem;
+        background: #777;
+        border-radius: 5rem;
+        cursor: pointer;
+    }
+
+    .wrapper-folder {
+        margin: 1.5rem 0;
+        display: grid;
+        padding: 0 1rem;
+        grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+        gap: 1.5rem;
+        
+
+
+        .box-folderSave {
+            border-radius: 1rem;
+            padding: 1.5rem;
+            background: var(--background);
+            box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .1);
+            cursor: pointer;
+            height: 12rem;
+            background: linear-gradient(to right, #fbe7c2, #a6c1ee);
+
+            &.active {
+                border: .1rem solid #0095f6;
+            }
+
+            h4 {
+                font-size: 1.4rem;
+                text-transform: capitalize;
+            }
+        }
+    }
+}

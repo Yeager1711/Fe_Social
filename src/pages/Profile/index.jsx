@@ -26,7 +26,7 @@ import PreviewAvatar from '~/components/Layouts/Popup/PreviewAvatar';
 import DetailModalComments from '~/components/Layouts/Popup/Details/Comments';
 import PostActions from '~/components/Layouts/Popup/PostAction'
 
-import {formatTimeAgo } from '~/ultis/formatTimeAgo'
+import { formatTimeAgo } from '~/ultis/formatTimeAgo'
 import { CiCirclePlus } from "react-icons/ci";
 
 import Cookies from "js-cookie";
@@ -45,7 +45,9 @@ function Profile() {
     const [isModalOpen, setModalOpen] = useState(false);
     const [selectedPostData, setSelectedPostData] = useState(null);
     const [commentsModalOpen, setCommentsModalOpen] = useState(false);
-    const [postData, setPostData] = useState(null);
+    const [activeTab, setActiveTab] = useState('post');
+    const [folders, setFolders] = useState([]);
+    const [activeFolderId, setActiveFolderId] = useState(null);
 
 
     const openEditProfile = () => setEditOpen(true);
@@ -55,6 +57,25 @@ function Profile() {
     const closeCommentsModal = () => setCommentsModalOpen(false);
 
     const navigator = useNavigate();
+
+    useEffect(() => {
+        fetch_FolderSaved();
+    }, []);
+
+    const fetch_FolderSaved = async () => {
+        try {
+            const response = await axios.get(`${apiUrl}/saved/get/get_FolderSave`, {
+                headers: {
+                    Authorization: `Bearer ${Cookies.get('access_token')}`,
+                },
+            });
+
+            const sortedFolderSave = response.data.folders.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            setFolders(sortedFolderSave);
+        } catch (error) {
+            console.error("Error fetching folders:", error);
+        }
+    };
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -103,6 +124,14 @@ function Profile() {
         setCommentsModalOpen(true); // Open the comments modal
     };
 
+    // Handle tab click to change active tab
+    const handleTabClick = (tab) => {
+        setActiveTab(tab);
+    };
+
+    const handleFolderClick = async (folderId) => {
+        setActiveFolderId(folderId);
+    };
 
 
     return (
@@ -136,8 +165,18 @@ function Profile() {
                 </div>
                 <button className={cx('edit-profile')} onClick={openEditProfile}>Edit profile</button>
                 <nav className={cx('profile-tabs')}>
-                    <span className={cx('active')}>Post</span>
-                    <span>Save</span>
+                    <span
+                        className={cx({ active: activeTab === 'post' })}
+                        onClick={() => handleTabClick('post')}
+                    >
+                        Post
+                    </span>
+                    <span
+                        className={cx({ active: activeTab === 'save' })}
+                        onClick={() => handleTabClick('save')}
+                    >
+                        Saved
+                    </span>
                 </nav>
                 <div className={cx('new-thread')}>
                     <div>
@@ -173,67 +212,91 @@ function Profile() {
                         </div>
                     </div>
                 </div>
-                <div className={cx('list-postArticle')}>
-                    {postArticle && postArticle.length > 0 ? (
-                        postArticle.map((article) => (
-                            <div className="box-postArticle" key={article.postArticle.postId}>
-                                <div>
-                                    <div className="post-header">
-                                        <div style={{ display: 'flex' }}>
-                                            {article.account.avatar ? (
-                                                <img src={article.account.avatar} alt="Profile" className="profile-pic" />
-                                            ) : (
-                                                <img src="/images/act_default.jpg" alt="Profile" className="profile-pic" />
-                                            )}
-                                            <div className="post-info">
-                                                <span className="fullname">{article.account.firstName} {article.account.lastName}</span>
-                                                <span className="time">{formatTimeAgo(article.postArticle.created_at)}</span>
+
+                {/* Post Tab Content */}
+                {activeTab === 'post' && (
+                    <div className={cx('list-postArticle')}>
+                        {postArticle && postArticle.length > 0 ? (
+                            postArticle.map((article) => (
+                                <div className="box-postArticle" key={article.postArticle.postId}>
+                                    <div>
+                                        <div className="post-header">
+                                            <div style={{ display: 'flex' }}>
+                                                {article.account.avatar ? (
+                                                    <img src={article.account.avatar} alt="Profile" className="profile-pic" />
+                                                ) : (
+                                                    <img src="/images/act_default.jpg" alt="Profile" className="profile-pic" />
+                                                )}
+                                                <div className="post-info">
+                                                    <span className="fullname">{article.account.firstName} {article.account.lastName}</span>
+                                                    <span className="time">{formatTimeAgo(article.postArticle.created_at)}</span>
+                                                </div>
                                             </div>
+
+                                            <PostActions postId={article.postArticle.postId} />
                                         </div>
-
-                                        <PostActions />
-
+                                        <div className="post-content"
+                                            dangerouslySetInnerHTML={{ __html: article.postArticle.content }}
+                                        />
                                     </div>
-                                    <div className="post-content"
-                                        dangerouslySetInnerHTML={{ __html: article.postArticle.content }}
-                                    />
-                                </div>
-                                {/* Hiển thị hình ảnh bài viết */}
-                                <div className="post-image">
-                                    {article.thumbnails.length > 0 && (
-                                        <Swiper
-                                            cssMode={true}
-                                            navigation={true}
-                                            pagination={false}
-                                            mousewheel={true}
-                                            keyboard={true}
-                                            modules={[Navigation, Pagination, Mousewheel, Keyboard]}
-                                            className="mySwiper"
-                                            slidesPerView={3} 
-                                            spaceBetween={10} 
-                                        >
-                                            {article.thumbnails.map((thumbnail) => (
-                                                <SwiperSlide key={thumbnail}>
-                                                    <img src={thumbnail} alt="Post Thumbnail" />
-                                                </SwiperSlide>
-                                            ))}
-                                        </Swiper>
-                                    )}
-                                </div>
 
-                                <div className="post-footer">
-                                    <span className="icon"><FontAwesomeIcon icon={faHeart} /> 32</span>
-                                    <span className="icon" onClick={() => { openCommentsModal(article.postArticle); console.log("Post ID clicked:", article.postArticle.postId); }}>
-                                        <FontAwesomeIcon icon={faComment} /> 2
-                                    </span>
-                                    <span className="icon"><FontAwesomeIcon icon={faShare} /></span>
+                                    <div className="post-image">
+                                        {article.thumbnails.length > 0 && (
+                                            <Swiper
+                                                cssMode={true}
+                                                navigation={true}
+                                                pagination={false}
+                                                mousewheel={true}
+                                                keyboard={true}
+                                                modules={[Navigation, Pagination, Mousewheel, Keyboard]}
+                                                className="mySwiper"
+                                                slidesPerView={3}
+                                                spaceBetween={10}
+                                            >
+                                                {article.thumbnails.map((thumbnail) => (
+                                                    <SwiperSlide key={thumbnail}>
+                                                        <img src={thumbnail} alt="Post Thumbnail" />
+                                                    </SwiperSlide>
+                                                ))}
+                                            </Swiper>
+                                        )}
+                                    </div>
+
+                                    <div className="post-footer">
+                                        <span className="icon"><FontAwesomeIcon icon={faHeart} /> 32</span>
+                                        <span className="icon" onClick={() => { openCommentsModal(article.postArticle); }}>
+                                            <FontAwesomeIcon icon={faComment} /> 2
+                                        </span>
+                                        <span className="icon"><FontAwesomeIcon icon={faShare} /></span>
+                                    </div>
                                 </div>
-                            </div>
-                        ))
-                    ) : (
-                        <p style={{ textAlign: 'center', fontSize: '1.4rem', marginTop: '1rem' }}>No posts available.</p>
-                    )}
-                </div>
+                            ))
+                        ) : (
+                            <p style={{ textAlign: 'center', fontSize: '1.2rem' }}>No posts available.</p>
+                        )}
+                    </div>
+                )}
+                {/* Save Tab Content */}
+                {activeTab === 'save' && (
+
+                    <div className={cx('savedFolder-container')}>
+                        <div className="wrapper-folder">
+                            {folders && folders.length > 0 ? (
+                                folders.map((folder) => (
+                                    <div
+                                        key={folder.folderId}
+                                        className={cx('box-folderSave', { active: folder.folderId === activeFolderId })}
+                                        onClick={() => handleFolderClick(folder.folderId)}
+                                    >
+                                        <h4>{folder.name_folder}</h4>
+                                    </div>
+                                ))
+                            ) : (
+                                <p>Here you can see the saved posts...</p>
+                            )}
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* Comments Modal */}
