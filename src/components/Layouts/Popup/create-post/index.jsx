@@ -34,7 +34,6 @@ const Modal = ({ isOpen, onClose, addNewPost }) => {
     const [expanded, setExpanded] = useState(false);
     const [selectedIcon, setSelectedIcon] = useState(null);
     const [showAllIcons, setShowAllIcons] = useState(false);
-    const [selectedVideo, setSelectedVideo] = useState(null);
     const [userData, setUserData] = useState(null);
     const [error, setError] = useState(null);
     const [avatar, setAvatar] = useState({});
@@ -91,7 +90,6 @@ const Modal = ({ isOpen, onClose, addNewPost }) => {
     
         // Separate image and video files
         const imageFiles = files.filter(file => file.type.startsWith('image/'));
-        const videoFiles = files.filter(file => file.type === 'video/mp4');
     
         // Single file selection logic
         if (files.length === 1 && !multipleFilesMode) {
@@ -100,18 +98,13 @@ const Modal = ({ isOpen, onClose, addNewPost }) => {
     
             if (file.type.startsWith('image/')) {
                 setSelectedImage(URL.createObjectURL(file));
-                setSelectedVideo(null); // Clear video when an image is selected
                 setSelectedImages(prevImages => [
                     ...prevImages.filter(image => image.url !== URL.createObjectURL(file)), // Remove duplicates
                     { file: file, url: URL.createObjectURL(file) }
                 ]);
-            } else if (file.type === 'video/mp4') {
-                setSelectedVideo(URL.createObjectURL(file));
-                setSelectedImage(null); // Clear image when a video is selected
             } else {
                 console.log('Please select an image or video in the correct format!');
                 setSelectedImage(null);
-                setSelectedVideo(null);
             }
         }
         // Multiple file selection logic
@@ -174,7 +167,6 @@ const Modal = ({ isOpen, onClose, addNewPost }) => {
 
     const handleModalClose = () => {
         setSelectedImage(null);
-        setSelectedVideo(null);
         onClose();
     }
     return (
@@ -205,18 +197,9 @@ const Modal = ({ isOpen, onClose, addNewPost }) => {
                         <>
                             <div className={cx('wapper-imagePreview-Multipless')}>
                                 <div>
-                                    {!multipleFilesMode && selectedImage && !selectedVideo && (
+                                    {!multipleFilesMode && selectedImage && (
                                         <div className={cx('image-preview-selected')}>
                                             <img src={selectedImage} alt="Selected" className={cx('preview-image')} />
-                                        </div>
-                                    )}
-
-                                    {!multipleFilesMode && selectedVideo && !selectedImage && (
-                                        <div className={cx('image-preview-selected')}>
-                                            <video controls className={cx('preview-video')}>
-                                                <source src={selectedVideo} type="video/mp4" />
-                                                Your browser does not support the video tag.
-                                            </video>
                                         </div>
                                     )}
 
@@ -307,7 +290,7 @@ const Modal = ({ isOpen, onClose, addNewPost }) => {
                                 <div className={cx('box-selected')}>
                                     <div className='box'>
                                         {/* svg */}
-                                        <span>Drag photos and videos here</span>
+                                        <span>Drag photos here</span>
                                         <div className='mr-top'>
                                             <input
                                                 type="file"

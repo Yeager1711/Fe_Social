@@ -28,7 +28,7 @@ function Home() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedPostData, setSelectedPostData] = useState(null);
     const [postArticle, setPostArticle] = useState([]);
-    const [likeData, setLikeData] = useState([]); // To store like status and counts for each post
+    const [likeData, setLikeData] = useState([]); 
 
     const Access_token = Cookies.get('access_token');
     const currentAccountId = Access_token ? jwtDecode(Access_token).accountId : null

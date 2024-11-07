@@ -7,6 +7,7 @@ import { CiSettings } from "react-icons/ci";
 import { CiBookmark } from "react-icons/ci";
 import { IoIosLogOut } from "react-icons/io";
 import { IoSunnyOutline } from "react-icons/io5";
+import { SiAirplayvideo } from "react-icons/si";
 
 import Cookies from "js-cookie";
 import { useNavigate } from 'react-router-dom';
@@ -36,6 +37,7 @@ function MoreHeader({ onClose }) {
 
             <span className={cx('action-button')}><CiSettings /> settings</span>
             <span className={cx('action-button')}><IoSunnyOutline /> Switch appearance</span>
+            <span className={cx('action-button')}><SiAirplayvideo /> Reels</span>
             {access_token && (
                 <span className={cx('wapper-actionButton')}>
                     <span className={cx('action-button')}><CiBookmark /> Saved</span>

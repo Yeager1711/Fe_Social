@@ -30,7 +30,7 @@ import { formatTimeAgo } from '~/ultis/formatTimeAgo'
 import { CiCirclePlus } from "react-icons/ci";
 
 import Cookies from "js-cookie";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 
 import { checkAccessToken } from "~/ultis/checkTokenValid";
 
@@ -177,6 +177,12 @@ function Profile() {
                         Post
                     </span>
                     <span
+                        className={cx({ active: activeTab === 'reels' })}
+                        onClick={() => handleTabClick('reels')}
+                    >
+                        Reels
+                    </span>
+                    <span
                         className={cx({ active: activeTab === 'save' })}
                         onClick={() => handleTabClick('save')}
                     >
@@ -301,6 +307,11 @@ function Profile() {
                             )}
                         </div>
                     </div>
+                )}
+
+                {activeTab === 'reels' && (
+                    <div></div>
+
                 )}
             </div>
 

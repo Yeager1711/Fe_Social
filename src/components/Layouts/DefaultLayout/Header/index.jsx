@@ -4,19 +4,29 @@ import Cookies from 'js-cookie';
 import classNames from 'classnames/bind';
 import styles from './Header.Module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBars, faHouse, faMagnifyingGlass, faPaperclip, faHeart, faSquarePlus } from '@fortawesome/free-solid-svg-icons';
+import {
+  faBars,
+  faHouse,
+  faMagnifyingGlass,
+  faPaperclip,
+  faHeart,
+  faSquarePlus,
+  faChevronLeft,
+  faChevronRight,
+  faChevronDown
+} from '@fortawesome/free-solid-svg-icons';
 
 // import components
 import Modal from '~/components/Layouts/Popup/create-post';
 import Notifications from '~/components/Layouts/Popup/Notifications';
 import Search from '~/components/Layouts/Popup/Search';
-import MoreHeader  from '../../Popup/More-Header';
+import MoreHeader from '../../Popup/More-Header';
+import CreateReels  from '../../Popup/create-reels';
 
 // icons React
-import { CiSettings } from "react-icons/ci";
-import { CiBookmark } from "react-icons/ci";
-import { IoIosLogOut } from "react-icons/io";
-import { IoSunnyOutline } from "react-icons/io5";
+import { CiSettings, CiBookmark } from 'react-icons/ci';
+import { IoIosLogOut } from 'react-icons/io';
+import { IoSunnyOutline } from 'react-icons/io5';
 
 //apiRequestWithAuth
 import { apiRequestWithAuth } from '~/ultis/auth'
@@ -30,12 +40,18 @@ function Header() {
   const location = useLocation();
   const navigate = useNavigate();
   const [activeItem, setActiveItem] = useState(location.pathname);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalOpenNotifications, setIsModalOpenNotifications] = useState(false);
   const [isModalOpenSearch, setIsModalOpenSearch] = useState(false);
-  const [isMoreHeaderOpen, setIsMoreHeaderOpen] = useState(false)
+  const [isMoreHeaderOpen, setIsMoreHeaderOpen] = useState(false);
+  const [isModalReelsOpen, setIsModalReelsOpen] = useState(false);
+
+  const [isCreateDropdownOpen, setIsCreateDropdownOpen] = useState(false); // New state for dropdown
+
   const [username, setUsername] = useState('');
   const [avatar, setAvatar] = useState({});
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   // fetch api
   useEffect(() => {
@@ -53,23 +69,33 @@ function Header() {
         .then((data) => {
           if (data && data.username) {
             setUsername(data.username);
-            setAvatar({ avatar: data.avatar })
+            setAvatar({ avatar: data.avatar });
           }
         })
         .catch((error) => console.error('Error fetching user data:', error));
-    }else {
-      setUsername('')
-      setAvatar('')
+    } else {
+      setUsername('');
+      setAvatar('');
     }
   }, [location, Cookies.get('access_token')]);
+
 
   const handleActiveItem = (item) => {
     setActiveItem(item);
   };
 
   const handleCreateClick = () => {
+    setIsCreateDropdownOpen(!isCreateDropdownOpen); // Toggle dropdown visibility
+  };
+
+  const handleCreatePost = () => {
     setActiveItem('create');
-    setIsModalOpen(true);
+    setIsCreateDropdownOpen(false); // Close dropdown
+    setIsModalOpen(true); // Open create post modal
+  };
+
+  const handleCreateReels = () => {
+    setIsModalReelsOpen(true);
   };
 
   const handleOpenNotifications = () => {
@@ -86,10 +112,11 @@ function Header() {
     setIsModalOpen(false);
     setIsModalOpenNotifications(false);
     setIsModalOpenSearch(false);
+    setIsModalReelsOpen(false);
   };
 
   const handleProfileClick = () => {
-    const token = Cookies.get("access_token")
+    const token = Cookies.get("access_token");
     if (token && username) {
       navigate(`/SocializeIt/profile/@${username}`);
     } else {
@@ -97,12 +124,17 @@ function Header() {
     }
   };
 
-  const toggleMoreHeader = () =>{
-    setIsMoreHeaderOpen(!isMoreHeaderOpen)
-  }
+  const toggleMoreHeader = () => {
+    setIsMoreHeaderOpen(!isMoreHeaderOpen);
+  };
+
+  const toggleCollapse = () => {
+    setIsCollapsed(!isCollapsed);
+  };
 
   return (
-    <header className={cx('wrapper-header')}>
+    <header className={cx('wrapper-header', { 'collapsed': isCollapsed })}>
+      <FontAwesomeIcon className={cx('chevronLeft')} icon={faChevronLeft} onClick={toggleCollapse} />
       <div className="logo">SocializeIt</div>
 
       <nav className={cx('navbar')}>
@@ -111,14 +143,16 @@ function Header() {
           className={cx('nav-link', { 'active': activeItem === '/' })}
           onClick={() => handleActiveItem('/')}
         >
-          <FontAwesomeIcon icon={faHouse} /> home
+          <FontAwesomeIcon icon={faHouse} />
+          <span>home</span>
         </Link>
 
         <div
           className={cx('nav-link', { 'active': activeItem === 'search' })}
           onClick={handleOpenSearch}
         >
-          <FontAwesomeIcon icon={faMagnifyingGlass} /> search
+          <FontAwesomeIcon icon={faMagnifyingGlass} />
+          <span> search</span>
         </div>
 
         <Link
@@ -126,22 +160,35 @@ function Header() {
           className={cx('nav-link', { 'active': activeItem === '/socializeIt/explore' })}
           onClick={() => handleActiveItem('/socializeIt/explore')}
         >
-          <FontAwesomeIcon icon={faPaperclip} /> explore
+          <FontAwesomeIcon icon={faPaperclip} />
+          <span>explore</span>
         </Link>
 
         <div
           className={cx('nav-link', { 'active': activeItem === 'notifications' })}
           onClick={handleOpenNotifications}
         >
-          <FontAwesomeIcon icon={faHeart} /> notifications
+          <FontAwesomeIcon icon={faHeart} />
+          <span> notifications</span>
         </div>
 
         <div
-          className={cx('nav-link', { 'active': activeItem === 'create' })}
+          className={cx('nav-link navDropdown', { 'active': activeItem === 'create' })}
           onClick={handleCreateClick}
         >
-          <FontAwesomeIcon icon={faSquarePlus} /> create
+          <FontAwesomeIcon icon={faSquarePlus} />
+          <span>create </span>
+
+
+
         </div>
+        {/* Dropdown Menu for Create Post or Create Reels */}
+        {isCreateDropdownOpen && (
+          <div className={cx('dropdown-menu')}>
+            <div className={cx("btn-post")} onClick={handleCreatePost}>Post Image</div>
+            <div className={cx("btn-post")} onClick={handleCreateReels}>Post Reels</div>
+          </div>
+        )}
 
         <div
           className={cx('nav-link', { 'active': activeItem === `/SocializeIt/profile/@${username}` })}
@@ -152,12 +199,13 @@ function Header() {
           ) : (
             <img src="/images/avt_default.jpg" alt="Default Avatar" />
           )}
-          Profile
+          <span> Profile</span>
         </div>
       </nav>
 
       <div className={cx('footer-header')}>
-        <button className={cx('btn-moreOption', { 'active': activeItem === 'more' })}
+        <button
+          className={cx('btn-moreOption', { 'active': activeItem === 'more' })}
           onClick={toggleMoreHeader}
         >
           <FontAwesomeIcon icon={faBars} />
@@ -167,6 +215,7 @@ function Header() {
         {isMoreHeaderOpen && <MoreHeader onClose={() => setIsMoreHeaderOpen(false)} />}
       </div>
 
+      <CreateReels open={isModalReelsOpen} onClose={closeModal} />
       <Modal isOpen={isModalOpen} onClose={closeModal} />
       <Notifications isOpen={isModalOpenNotifications} onClose={closeModal} />
       <Search isOpen={isModalOpenSearch} onClose={closeModal} />

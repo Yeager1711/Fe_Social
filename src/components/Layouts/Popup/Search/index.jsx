@@ -2,77 +2,72 @@ import React, { useState, useEffect, useRef } from 'react';
 import styles from './Search.scss';
 import classNames from 'classnames/bind';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faXmark } from '@fortawesome/free-solid-svg-icons'; // Import icon nút X
+import { faXmark } from '@fortawesome/free-solid-svg-icons';
+import axios from 'axios';
+import Cookies from 'js-cookie';
 
 const cx = classNames.bind(styles);
+const apiUrl = process.env.REACT_APP_LOCAL_API_URL;
 
 function Search({ isOpen, onClose }) {
     const [searchQuery, setSearchQuery] = useState('');
+    const [articles, setArticles] = useState([]);
 
-    const postData = [
-        {
-            id: 8,
-            user: './images/user3.jpg',
-            userName: 'itheme_design',
-            locationTag: 'Dubai, Các Tiểu Vương quốc Ả Rập Thống nhất',
-            image: './images/iphone3.mp4',
-            likes: '106,704',
-            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam....',
-            date: 'September 21',
-        },
-        {
-            id: 7,
-            user: './images/user2.jpg',
-            userName: 'archiportfoliomaker',
-            locationTag: 'Dubai, Các Tiểu Vương quốc Ả Rập Thống nhất',
-            image: './images/iphone2.mp4',
-            likes: '106,704',
-            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam....',
-            date: 'September 21',
-        },
-        {
-            id: 4,
-            user: './images/user5.jpg',
-            userName: 'imaaduuddin',
-            locationTag: 'Dubai, Các Tiểu Vương quốc Ả Rập Thống nhất',
-            image: './images/product3.jpg',
-            likes: '6,704',
-            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam....',
-            date: 'September 21',
-        },
-    ];
+    const fetchData = async () => {
+        try {
+            const response = await axios.get(`${apiUrl}/post/g_postArticleAll/getAll_Article`, {
+                headers: {
+                    Authorization: `Bearer ${Cookies.get('access_token')}`
+                },
+            });
+            // Ensure articles is an array
+            setArticles(Array.isArray(response.data.data) ? response.data.data : []);
+        } catch (error) {
+            console.error("Error fetching posts:", error);
+            setArticles([]); // Ensure articles is an array even on error
+        }
+    };
+
+    useEffect(() => {
+        fetchData();
+    }, []);
 
     const popupRef = useRef(null);
 
     useEffect(() => {
-        // Hàm kiểm tra nếu nhấn ngoài vùng popup
         const handleClickOutside = (event) => {
             if (popupRef.current && !popupRef.current.contains(event.target)) {
-                onClose(); // Đóng popup nếu nhấn bên ngoài
+                onClose();
             }
         };
 
-        // Chỉ thêm sự kiện nếu popup đang mở
         if (isOpen) {
             document.addEventListener('mousedown', handleClickOutside);
         }
 
-        // Cleanup sự kiện khi component unmount hoặc popup đóng
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
     }, [isOpen, onClose]);
 
-    const filteredPosts = postData.filter(
-        post =>
-            post.userName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            post.description.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    // Separate filtering logic based on the search query
+    const filteredPosts = articles.filter((post) => {
+        const queryLower = searchQuery.toLowerCase();
+        // Check if the search query matches the content or the account name
+        const isMatchingAccount =
+            post.account?.first_name?.toLowerCase().includes(queryLower) ||
+            post.account?.last_name?.toLowerCase().includes(queryLower);
 
+        const isMatchingContent =
+            post.content?.toLowerCase().includes(queryLower);
 
-    // Hàm xóa toàn bộ nội dung tìm kiếm
+        // Return true if content matches (show full post) or if it's an account search (show only account)
+        return isMatchingContent || isMatchingAccount;
+    });
+
+    // Handle search query clear
     const handleClearSearch = () => {
-        setSearchQuery(''); // Đặt lại searchQuery thành chuỗi rỗng
+        setSearchQuery('');
     };
 
     return (
@@ -87,7 +82,6 @@ function Search({ isOpen, onClose }) {
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
-                    {/* Hiển thị nút "X" khi có dữ liệu trong ô tìm kiếm */}
                     {searchQuery && (
                         <button className={cx('clear-button')} onClick={handleClearSearch}>
                             <FontAwesomeIcon icon={faXmark} />
@@ -96,25 +90,36 @@ function Search({ isOpen, onClose }) {
                 </div>
 
                 <div className={cx('Recent')}>
-                <h2>Recent</h2>
-                    {searchQuery && (
-                        <>
-                           
-                            {filteredPosts.length > 0 ? (
-                                filteredPosts.map(post => (
-                                    <div key={post.id} className={cx('search-result')}>
-                                        <img src={post.user} alt={post.userName} className={cx('user-image')} />
-                                        <div>
-                                            <strong>{post.userName}</strong>
-                                            <p>{post.description}</p>
-                                        </div>
+                    <h2>Recent</h2>
+                    <div className={cx('wrapper-result')}>
+                        {searchQuery && (
+                            <>
+                                {filteredPosts.length > 0 ? (
+                                    // Show only the first matching result
+                                    <div key={filteredPosts[0].postId} className={cx('search-result')}>
+                                        {/* Show account details if searching by first_name or last_name */}
+                                        {filteredPosts[0].account?.first_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                        filteredPosts[0].account?.last_name?.toLowerCase().includes(searchQuery.toLowerCase()) ? (
+                                            <div className={cx('account-info')}>
+                                                <img src={filteredPosts[0].account?.avatar || 'default-image-url'} alt={filteredPosts[0].account?.first_name || 'User'} className={cx('user-image')} />
+                                                <div>
+                                                    <strong>{filteredPosts[0].account.first_name} {filteredPosts[0].account.last_name}</strong>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            // Show full post details if searching by content
+                                            <div className={cx('post-content')}>
+                                                <strong>{filteredPosts[0].account.first_name} {filteredPosts[0].account.last_name}</strong>
+                                                <p style={{ marginLeft: '1.5rem', fontSize:'1.3rem', marginTop: '1rem' }}>{filteredPosts[0].content}</p>
+                                            </div>
+                                        )}
                                     </div>
-                                ))
-                            ) : (
-                                <p className={cx('no-result')}>No recent searches.</p>
-                            )}
-                        </>
-                    )}
+                                ) : (
+                                    <p className={cx('no-result')}>No results found.</p>
+                                )}
+                            </>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>
