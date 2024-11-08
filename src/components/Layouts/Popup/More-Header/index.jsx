@@ -28,6 +28,10 @@ function MoreHeader({ onClose }) {
         }
     }
 
+    const handleReels = () => {
+        navigate('/SocializeIt/reels')
+    }
+
 
     // check access token
     const access_token = Cookies.get('access_token');
@@ -37,7 +41,7 @@ function MoreHeader({ onClose }) {
 
             <span className={cx('action-button')}><CiSettings /> settings</span>
             <span className={cx('action-button')}><IoSunnyOutline /> Switch appearance</span>
-            <span className={cx('action-button')}><SiAirplayvideo /> Reels</span>
+            <span className={cx('action-button')} onClick={handleReels}><SiAirplayvideo /> Reels</span>
             {access_token && (
                 <span className={cx('wapper-actionButton')}>
                     <span className={cx('action-button')}><CiBookmark /> Saved</span>

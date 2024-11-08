@@ -1,10 +1,9 @@
 import Home from '~/pages/Home';
 import Explore from '~/pages/Explore';
 import Account from '~/pages/Account_Settings';
-import Work from '~/pages/Work';
 import Profile from '~/pages/Profile';
 import Saved from '~/pages/Saved';
-import Booking from '~/pages/Work';
+import Reels from '~/pages/Reels';
 
 
 // Auth
@@ -23,10 +22,9 @@ const publicRoutes = [
   { path: '/', component: Home },
   { path: '/SocializeIt/explore', component: Explore },
   { path: '/SocializeIt/account', component: Account },
-  { path: '/SocializeIt/work', component: Work },
   { path: '/SocializeIt/profile/:username', component: Profile },
   { path: '/SocializeIt/profile/:username/saved/:name_folder/:folderId', component: Saved },
-  { path: '/SocializeIt/booking', component: Booking },
+  { path: '/SocializeIt/reels', component: Reels },
 
   // Auth
   { path: '/SocializeIt/auth/login', component: Login },

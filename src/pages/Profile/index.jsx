@@ -49,6 +49,7 @@ function Profile() {
     const [activeTab, setActiveTab] = useState('post');
     const [folders, setFolders] = useState([]);
     const [activeFolderId, setActiveFolderId] = useState(null);
+    const [reels, setReels] = useState([])
 
 
     const openEditProfile = () => setEditOpen(true);
@@ -77,6 +78,24 @@ function Profile() {
             console.error("Error fetching folders:", error);
         }
     };
+
+    useEffect(() => {
+        const fetchReelsData = async () => {
+            try {
+                const response = await axios.get(`${apiUrl}/reels/get/get_Reels`, {
+                    headers: {
+                        Authorization: `Bearer ${Cookies.get('access_token')}`,
+                    },
+                });
+                setReels(response.data); // Assuming the API response has a 'reels' array
+            } catch (error) {
+                console.error("Error fetching reels:", error);
+            }
+        };
+
+        fetchReelsData();
+    }, []);
+
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -211,14 +230,14 @@ function Profile() {
                         </div>
                         <div className={cx('step-item')}>
                             <FontAwesomeIcon icon={faUsers} />
-                            <span>Follow 5 profiles</span>
-                            <p>Fill your feed with threads that interest you.</p>
+                            <span>Create Reels</span>
+                            <p>Upload your favorite videos.</p>
                             <button>See profiles</button>
                         </div>
                         <div className={cx('step-item')}>
                             <FontAwesomeIcon icon={faPenToSquare} />
-                            <span>Create thread</span>
-                            <p>Say what’s on your mind or share a recent highlight.</p>
+                            <span>Create folder save</span>
+                            <p>Create and add your favorite posts.</p>
                             <button>Create</button>
                         </div>
                     </div>
@@ -310,8 +329,24 @@ function Profile() {
                 )}
 
                 {activeTab === 'reels' && (
-                    <div></div>
-
+                    <div className={cx('reels-container')}>
+                        {reels && reels.length > 0 ? (
+                            reels.map((reel) => (
+                                <div className={cx('reel-item')} key={reel.reelId}>
+                                    <video controls>
+                                        <source
+                                            src={`data:video/mp4;base64,${reel.media}`}
+                                            type="video/mp4"
+                                        />
+                                        Your browser does not support the video tag.
+                                    </video>
+                                    {/* <p>{reel.description}</p> */}
+                                </div>
+                            ))
+                        ) : (
+                            <p>No reels available.</p>
+                        )}
+                    </div>
                 )}
             </div>
 
@@ -324,7 +359,7 @@ function Profile() {
             {/* Edit Profile Modal */}
             <EditProfile isOpen={isEditOpen} onClose={closeEditProfile} />
             {/* Avatar Preview Modal */}
-            <PreviewAvatar isOpen={isPreviewAvatar} onClose={closePreviewAvatar} />
+            <PreviewAvatar isOpen={isPreviewAvatar} onClose={closePreviewAvatar} src={userData.avatar} />
         </div>
     );
 }

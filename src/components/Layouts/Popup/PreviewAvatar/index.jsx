@@ -4,7 +4,7 @@ import classNames from "classnames/bind";
 
 const cx = classNames.bind(styles);
 
-function PreviewAvatar({ isOpen, onClose, avatarUrl }) {
+function PreviewAvatar({ isOpen, onClose, src }) {
     const modalRef = useRef(null);
 
     const handleClickOutside = (event) => {
@@ -30,7 +30,7 @@ function PreviewAvatar({ isOpen, onClose, avatarUrl }) {
         <div className={cx('modal')}>
             <div className={cx('modal-previewContainer')} ref={modalRef}>
                 <div className={cx('avatarPreview')}>
-                    <img src={avatarUrl} alt="User Avatar Preview" className={cx('previewImage')} />
+                {src ? <img src={src} alt="Preview Avatar" /> : <p>No Image Available</p>}
                 </div>
             </div>
         </div>

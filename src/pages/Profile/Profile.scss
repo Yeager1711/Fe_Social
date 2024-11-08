@@ -405,3 +405,17 @@
         }
     }
 }
+
+.reels-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(25rem, 1fr));
+    gap: 2rem;
+
+    .reel-item {
+        border-radius: 1rem;
+        overflow: hidden;
+        video {
+            width: 100%;
+        }
+    }
+}

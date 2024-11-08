@@ -1,0 +1,161 @@
+.reels {
+    position: relative;
+    min-height: 100%;
+    // overflow: hidden;
+
+    .reels-container {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translate(-50%, 0);
+        max-width: 40rem;
+        width: 100%;
+
+        .box {
+            max-width: 35rem;
+            width: 95%;
+            margin-bottom: 2rem;
+
+            .box-reels {
+                display: flex;
+                gap: 1.5rem;
+                max-width: 60rem;
+                height: 62rem;
+                position: relative;
+
+                .video-reels {
+                    height: 62rem;
+                    border-radius: 1rem;
+                    overflow: hidden;
+
+                    video {
+                        width: 100%;
+                        height: 100%;
+                    }
+
+                    &:hover {
+                        .wrap-modal {
+                            transition: .3s linear;
+                            bottom: 7.3rem;
+                            left: 2rem;
+                            left: 2rem;
+                            right: 2rem;
+                            background: rgba(0, 0, 0, .3);
+
+                        }
+                    }
+                }
+
+                .wrap-modal {
+                    position: absolute;
+                    bottom: 0;
+                    left: 0;
+                    right: .2rem;
+                    background: rgba(0, 0, 0, 1);
+                    padding: 1rem;
+                    border-radius: .5rem;
+
+                    .account-reels {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+
+
+                        .flex-name {
+                            gap: 1rem;
+                            align-items: center;
+                            display: flex;
+
+                            .img-account {
+                                img {
+                                    width: 3.5rem;
+                                    height: 3.5rem;
+                                    border-radius: 50%;
+                                    object-fit: cover;
+                                }
+                            }
+                        }
+
+                        .flex-button {
+                            button {
+                                padding: .5rem 2rem;
+                                border-radius: .5rem;
+                                font-size: 1.3rem;
+                                text-transform: capitalize;
+                                border: .1rem solid var(--colorTextWhite);
+                                background: none;
+                                color: var(--colorTextWhite);
+                            }
+                        }
+
+                        span {
+                            font-size: 1.4rem;
+                            color: var(--colorTextWhite);
+                            font-weight: 550;
+                        }
+                    }
+
+                    .content {
+                        margin-top: 1rem;
+                        overflow: hidden; // Hide overflow content when collapsed
+                        transition: height 0.3s ease;
+                    
+                        &::-webkit-scrollbar {
+                            background: #dbdbdb;
+                            height: 0.1rem;
+                            width: 0.9rem;
+                            border-radius: 1rem;
+                        }
+                    
+                        &::-webkit-scrollbar-thumb {
+                            height: 0.1rem;
+                            width: 0.3rem;
+                            background: #777;
+                            border-radius: 5rem;
+                            cursor: pointer;
+                        }
+                    
+                        span {
+                            font-size: 1.3rem;
+                            white-space: pre-wrap;
+                            color: var(--colorTextWhite);
+                            line-height: 1.5;
+                        }
+                    }
+                    
+                    .toggle-button {
+                        background: none;
+                        border: none;
+                        color: var(--colorTextWhite);
+                        cursor: pointer;
+                        font-size: 1.2rem;
+                        margin-top: 0.5rem;
+                    }
+                    
+                }
+
+                .action-reels {
+                    display: none;
+                    position: absolute;
+                    bottom: 0;
+                    right: -5rem;
+
+                    .heart {
+                        display: block;
+                        margin-bottom: 1.5rem;
+                        font-size: 3.3rem;
+                    }
+
+                    .cmt {
+
+                        display: block;
+                        margin-bottom: 1.5rem;
+                        font-size: 2.5rem;
+                    }
+                }
+            }
+        }
+
+
+    }
+}
